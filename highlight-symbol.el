@@ -3,7 +3,7 @@
 ;; Copyright (C) 2007 Nikolaj Schumacher
 ;;
 ;; Author: Nikolaj Schumacher <bugs * nschum de>
-;; Version: 1.0.1
+;; Version: 1.0.2
 ;; Keywords: faces, matching
 ;; URL: http://nschum.de/src/emacs/highlight-symbol/
 ;; Compatibility: GNU Emacs 22.x
@@ -42,6 +42,9 @@
 ;;
 ;;; Change Log:
 ;;
+;; 2007-09-06 (1.0.2)
+;;    Fixed highlighting with delay set to 0.  (thanks to Stefan Persson)
+;;
 ;; 2007-09-05 (1.0.1)
 ;;    Fixed completely broken temporary highlighting.
 ;;
@@ -61,6 +64,7 @@
 
 (require 'thingatpt)
 (require 'hi-lock)
+(eval-when-compile (require 'cl))
 
 (push "^No symbol at point$" debug-ignored-errors)
 
@@ -97,7 +101,7 @@ highlighting the symbols will use these colors in order."
 (make-variable-buffer-local 'highlight-symbol-color-index)
 
 (defvar highlight-symbol-timer nil)
-(defvar highlight-symbol-instances nil)
+(make-variable-buffer-local 'highlight-symbol-timer)
 
 (defvar highlight-symbol nil)
 (make-variable-buffer-local 'highlight-symbol)
@@ -117,7 +121,6 @@ Highlighting takes place after `highlight-symbol-idle-delay'."
       ;; on
       (progn
         (unless hi-lock-mode (hi-lock-mode 1))
-        (add-to-list 'highlight-symbol-instances (current-buffer))
         (unless highlight-symbol-timer
           (setq highlight-symbol-timer
                 (when (and highlight-symbol-idle-delay
@@ -127,12 +130,9 @@ Highlighting takes place after `highlight-symbol-idle-delay'."
         (add-hook 'post-command-hook 'highlight-symbol-mode-post-command nil t))
     ;; off
     (remove-hook 'post-command-hook 'highlight-symbol-mode-post-command t)
-    (setq highlight-symbol-instances
-          (delete (current-buffer) highlight-symbol-instances))
-    (unless (or highlight-symbol-instances
-                (null highlight-symbol-timer))
+    (unless (null highlight-symbol-timer)
       (cancel-timer highlight-symbol-timer)
-      (setq highlight-symbol-timer nil))
+      (kill-local-variable 'highlight-symbol-timer))
 
     (highlight-symbol-mode-remove-temp)
     (kill-local-variable 'highlight-symbol)))
@@ -195,7 +195,7 @@ element in of `highlight-symbol-faces'."
   (interactive)
   (save-restriction
     (narrow-to-defun)
-    (highlight-symbol-jump -11)))
+    (highlight-symbol-jump -1)))
 
 (defun highlight-symbol-get-symbol ()
   "Return a regular expression dandifying the symbol at point."
@@ -211,8 +211,9 @@ element in of `highlight-symbol-faces'."
       (unless (or (equal symbol highlight-symbol)
                   (member symbol highlight-symbol-list))
         (highlight-symbol-mode-remove-temp)
-        (setq highlight-symbol symbol)
-        (hi-lock-set-pattern symbol 'highlight-symbol-face)))))
+        (when symbol
+          (setq highlight-symbol symbol)
+          (hi-lock-set-pattern symbol 'highlight-symbol-face))))))
 
 (defun highlight-symbol-mode-remove-temp ()
   "Remove the temporary symbol highlighting."
@@ -224,10 +225,9 @@ element in of `highlight-symbol-faces'."
   "After a command, change the temporary highlighting.
 Remove the temporary symbol highlighting and, unless a timeout is specified,
 create the new one."
-  (unless (eq this-command 'highlight-symbol-jump-to-next)
+  (unless (eq this-command 'highlight-symbol-jump)
     (if highlight-symbol-timer
-        (unless (eq this-command 'highlight-symbol-jump)
-          (highlight-symbol-mode-remove-temp))
+        (highlight-symbol-mode-remove-temp)
       (highlight-symbol-temp-highlight))))
 
 (defun highlight-symbol-jump (dir)
