@@ -3,7 +3,7 @@
 ;; Copyright (C) 2007-2008 Nikolaj Schumacher
 ;;
 ;; Author: Nikolaj Schumacher <bugs * nschum de>
-;; Version: 1.0.3
+;; Version: 1.0.4
 ;; Keywords: faces, matching
 ;; URL: http://nschum.de/src/emacs/highlight-symbol/
 ;; Compatibility: GNU Emacs 22.x
@@ -43,6 +43,8 @@
 ;; regardless of `highlight-symbol-idle-delay'.
 ;;
 ;;; Change Log:
+;;
+;; 2008-05-02 (1.0.4)
 ;;    Added `highlight-symbol-on-navigation-p' option.
 ;;
 ;; 2008-02-26 (1.0.3)
