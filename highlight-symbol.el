@@ -84,12 +84,24 @@
   "*Face used by `highlight-symbol-mode'."
   :group 'highlight-symbol)
 
+(defvar highlight-symbol-timer nil)
+
+(defun highlight-symbol-update-timer (&optional ignored ignored)
+  (when highlight-symbol-timer
+    (cancel-timer highlight-symbol-timer))
+  (setq highlight-symbol-timer
+        (and highlight-symbol-idle-delay
+             (/= highlight-symbol-idle-delay 0)
+             (run-with-idle-timer highlight-symbol-idle-delay t
+                                  'highlight-symbol-temp-highlight))))
+
 (defcustom highlight-symbol-idle-delay 1.5
   "*Number of seconds of idle time before highlighting the current symbol.
 If this variable is set to 0, no idle time is required.
 Changing this does not take effect until `highlight-symbol-mode' has been
 disabled for all buffers."
   :type 'number
+  :set 'highlight-symbol-update-timer
   :group 'highlight-symbol)
 
 (defcustom highlight-symbol-colors
@@ -102,9 +114,6 @@ highlighting the symbols will use these colors in order."
 
 (defvar highlight-symbol-color-index 0)
 (make-variable-buffer-local 'highlight-symbol-color-index)
-
-(defvar highlight-symbol-timer nil)
-(make-variable-buffer-local 'highlight-symbol-timer)
 
 (defvar highlight-symbol nil)
 (make-variable-buffer-local 'highlight-symbol)
@@ -124,19 +133,10 @@ Highlighting takes place after `highlight-symbol-idle-delay'."
       ;; on
       (let ((hi-lock-archaic-interface-message-used t))
         (unless hi-lock-mode (hi-lock-mode 1))
-        (unless highlight-symbol-timer
-          (setq highlight-symbol-timer
-                (when (and highlight-symbol-idle-delay
-                           (/= highlight-symbol-idle-delay 0))
-                  (run-with-idle-timer highlight-symbol-idle-delay t
-                                       'highlight-symbol-temp-highlight))))
+        (highlight-symbol-update-timer)
         (add-hook 'post-command-hook 'highlight-symbol-mode-post-command nil t))
     ;; off
     (remove-hook 'post-command-hook 'highlight-symbol-mode-post-command t)
-    (unless (null highlight-symbol-timer)
-      (cancel-timer highlight-symbol-timer)
-      (kill-local-variable 'highlight-symbol-timer))
-
     (highlight-symbol-mode-remove-temp)
     (kill-local-variable 'highlight-symbol)))
 
@@ -236,9 +236,9 @@ element in of `highlight-symbol-faces'."
 Remove the temporary symbol highlighting and, unless a timeout is specified,
 create the new one."
   (unless (eq this-command 'highlight-symbol-jump)
-    (if highlight-symbol-timer
-        (highlight-symbol-mode-remove-temp)
-      (highlight-symbol-temp-highlight))))
+    (if (eql highlight-symbol-idle-delay 0)
+        (highlight-symbol-temp-highlight)
+      (highlight-symbol-mode-remove-temp))))
 
 (defun highlight-symbol-jump (dir)
   "Jump to the next or previous occurence of the symbol at point.
