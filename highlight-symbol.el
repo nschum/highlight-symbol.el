@@ -39,8 +39,11 @@
 ;; The functions `highlight-symbol-next', `highlight-symbol-prev',
 ;; `highlight-symbol-next-in-defun' and `highlight-symbol-prev-in-defun' allow
 ;; for cycling through the locations of any symbol at point.
+;; When `highlight-symbol-on-navigation-p' is set, highlighting is triggered
+;; regardless of `highlight-symbol-idle-delay'.
 ;;
 ;;; Change Log:
+;;    Added `highlight-symbol-on-navigation-p' option.
 ;;
 ;; 2008-02-26 (1.0.3)
 ;;    Added `highlight-symbol-remove-all'.
@@ -110,6 +113,12 @@ disabled for all buffers."
   "*Colors used by `highlight-symbol-at-point'.
 highlighting the symbols will use these colors in order."
   :type '(repeat color)
+  :group 'highlight-symbol)
+
+(defcustom highlight-symbol-on-navigation-p nil
+  "*Wether or not to temporary highlight the symbol when using
+`highlight-symbol-jump' family of functions."
+  :type 'boolean
   :group 'highlight-symbol)
 
 (defvar highlight-symbol-color-index 0)
@@ -235,7 +244,9 @@ element in of `highlight-symbol-faces'."
   "After a command, change the temporary highlighting.
 Remove the temporary symbol highlighting and, unless a timeout is specified,
 create the new one."
-  (unless (eq this-command 'highlight-symbol-jump)
+  (if (eq this-command 'highlight-symbol-jump)
+      (when highlight-symbol-on-navigation-p
+        (highlight-symbol-temp-highlight))
     (if (eql highlight-symbol-idle-delay 0)
         (highlight-symbol-temp-highlight)
       (highlight-symbol-mode-remove-temp))))
