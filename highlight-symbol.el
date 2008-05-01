@@ -122,7 +122,7 @@ Highlighting takes place after `highlight-symbol-idle-delay'."
   nil " hl-s" nil
   (if highlight-symbol-mode
       ;; on
-      (progn
+      (let ((hi-lock-archaic-interface-message-used t))
         (unless hi-lock-mode (hi-lock-mode 1))
         (unless highlight-symbol-timer
           (setq highlight-symbol-timer
