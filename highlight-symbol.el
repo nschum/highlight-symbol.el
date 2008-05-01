@@ -39,6 +39,9 @@
 ;;
 ;;; Changes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
+;; 2007-04-20 (0.9.1)
+;;     Fixed bug in `highlight-symbol-jump'.  (thanks to Per Nordlöw)
+;;
 ;; 2007-04-06 (0.9)
 ;;     Initial release.
 ;;
@@ -197,6 +200,8 @@ DIR has to be 1 or -1."
         (let* ((case-fold-search nil)
                (bounds (bounds-of-thing-at-point 'symbol))
                (offset (- (point) (if (< 0 dir) (cdr bounds) (car bounds)))))
+          ;; move a little, so we don't find the same instance again
+          (goto-char (- (point) offset))
           (let ((target (re-search-forward symbol nil t dir)))
             (unless target
               (goto-char (if (< 0 dir) (point-min) (point-max)))
