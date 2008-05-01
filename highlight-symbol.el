@@ -3,7 +3,7 @@
 ;; Copyright (C) 2007 Nikolaj Schumacher
 ;;
 ;; Author: Nikolaj Schumacher <bugs * nschum de>
-;; Version: 1.0
+;; Version: 1.0.1
 ;; Keywords: faces, matching
 ;; URL: http://nschum.de/src/emacs/highlight-symbol/
 ;; Compatibility: GNU Emacs 22.x
@@ -41,6 +41,9 @@
 ;; for cycling through the locations of any symbol at point.
 ;;
 ;;; Change Log:
+;;
+;; 2007-09-05 (1.0.1)
+;;    Fixed completely broken temporary highlighting.
 ;;
 ;; 2007-07-30 (1.0)
 ;;    Keep temp highlight while jumping.
@@ -112,8 +115,8 @@ Highlighting takes place after `highlight-symbol-idle-delay'."
   nil " hl-s" nil
   (if highlight-symbol-mode
       ;; on
-      (unless hi-lock-mode (hi-lock-mode 1))
       (progn
+        (unless hi-lock-mode (hi-lock-mode 1))
         (add-to-list 'highlight-symbol-instances (current-buffer))
         (unless highlight-symbol-timer
           (setq highlight-symbol-timer
