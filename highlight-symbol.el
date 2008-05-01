@@ -1,9 +1,9 @@
 ;;; highlight-symbol.el --- automatic and manual symbol highlighting
 ;;
-;; Copyright (C) 2007 Nikolaj Schumacher
+;; Copyright (C) 2007-2008 Nikolaj Schumacher
 ;;
 ;; Author: Nikolaj Schumacher <bugs * nschum de>
-;; Version: 1.0.2
+;; Version: 1.0.3
 ;; Keywords: faces, matching
 ;; URL: http://nschum.de/src/emacs/highlight-symbol/
 ;; Compatibility: GNU Emacs 22.x
@@ -41,6 +41,9 @@
 ;; for cycling through the locations of any symbol at point.
 ;;
 ;;; Change Log:
+;;
+;; 2008-02-26 (1.0.3)
+;;    Added `highlight-symbol-remove-all'.
 ;;
 ;; 2007-09-06 (1.0.2)
 ;;    Fixed highlighting with delay set to 0.  (thanks to Stefan Persson)
@@ -168,6 +171,13 @@ element in of `highlight-symbol-faces'."
               (hi-lock-set-pattern `(,symbol (0 (quote ,color) t)))
             (hi-lock-set-pattern symbol color)))
         (push symbol highlight-symbol-list)))))
+
+;;;###autoload
+(defun highlight-symbol-remove-all ()
+  "Remove symbol highlighting in buffer."
+  (interactive)
+  (mapc 'hi-lock-unface-buffer highlight-symbol-list)
+  (setq highlight-symbol-list nil))
 
 ;;;###autoload
 (defun highlight-symbol-next ()
