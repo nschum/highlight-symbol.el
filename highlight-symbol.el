@@ -44,6 +44,8 @@
 ;;
 ;;; Change Log:
 ;;
+;;    Fixed color repetition bug.  (thanks to Hugo Schmitt)
+;;
 ;; 2008-05-02 (1.0.4)
 ;;    Added `highlight-symbol-on-navigation-p' option.
 ;;
@@ -172,7 +174,7 @@ element in of `highlight-symbol-faces'."
                         highlight-symbol-colors)))
         (if color ;; wrap
             (incf highlight-symbol-color-index)
-          (setq highlight-symbol-color-index 0
+          (setq highlight-symbol-color-index 1
                 color (car highlight-symbol-colors)))
         (setq color `((background-color . ,color)
                       (foreground-color . "black")))
