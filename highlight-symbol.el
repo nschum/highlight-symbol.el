@@ -1,9 +1,9 @@
 ;;; highlight-symbol.el --- automatic and manual symbol highlighting
 ;;
-;; Copyright (C) 2007-2008 Nikolaj Schumacher
+;; Copyright (C) 2007-2009 Nikolaj Schumacher
 ;;
 ;; Author: Nikolaj Schumacher <bugs * nschum de>
-;; Version: 1.0.4
+;; Version: 1.0.5
 ;; Keywords: faces, matching
 ;; URL: http://nschum.de/src/emacs/highlight-symbol/
 ;; Compatibility: GNU Emacs 22.x, GNU Emacs 23.x
@@ -44,6 +44,7 @@
 ;;
 ;;; Change Log:
 ;;
+;; 2009-03-19 (1.0.5)
 ;;    Fixed `highlight-symbol-idle-delay' void variable message.
 ;;    Fixed color repetition bug.  (thanks to Hugo Schmitt)
 ;;
