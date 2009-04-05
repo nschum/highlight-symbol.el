@@ -31,6 +31,7 @@
 ;; (global-set-key [f3] 'highlight-symbol-next)
 ;; (global-set-key [(shift f3)] 'highlight-symbol-prev)
 ;; (global-set-key [(meta f3)] 'highlight-symbol-prev)))
+;; (global-set-key [(control meta f3)] 'highlight-symbol-query-replace)
 ;;
 ;; Use `highlight-symbol-at-point' to toggle highlighting of the symbol at
 ;; point throughout the current buffer.  Use `highlight-symbol-mode' to keep the
@@ -42,7 +43,11 @@
 ;; When `highlight-symbol-on-navigation-p' is set, highlighting is triggered
 ;; regardless of `highlight-symbol-idle-delay'.
 ;;
+;; `highlight-symbol-query-replace' can be used to replace the symbol.
+;;
 ;;; Change Log:
+;;
+;;    Added `highlight-symbol-query-replace'.
 ;;
 ;; 2009-03-19 (1.0.5)
 ;;    Fixed `highlight-symbol-idle-delay' void variable message.
@@ -226,6 +231,21 @@ element in of `highlight-symbol-faces'."
   (save-restriction
     (narrow-to-defun)
     (highlight-symbol-jump -1)))
+
+;;;###autoload
+(defun highlight-symbol-query-replace (replacement)
+  "*Replace the symbol at point."
+  (interactive (let ((symbol (or (thing-at-point 'symbol)
+                                 (error "No symbol at point"))))
+                 (highlight-symbol-temp-highlight)
+                 (set query-replace-to-history-variable
+                      (cons (substring-no-properties symbol)
+                            (eval query-replace-to-history-variable)))
+                 (list
+                  (read-from-minibuffer "Replacement: " nil nil nil
+                                        query-replace-to-history-variable))))
+  (goto-char (beginning-of-thing 'symbol))
+  (query-replace-regexp (highlight-symbol-get-symbol) replacement))
 
 (defun highlight-symbol-get-symbol ()
   "Return a regular expression dandifying the symbol at point."
