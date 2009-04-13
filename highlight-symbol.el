@@ -3,7 +3,7 @@
 ;; Copyright (C) 2007-2009 Nikolaj Schumacher
 ;;
 ;; Author: Nikolaj Schumacher <bugs * nschum de>
-;; Version: 1.0.5
+;; Version: 1.1
 ;; Keywords: faces, matching
 ;; URL: http://nschum.de/src/emacs/highlight-symbol/
 ;; Compatibility: GNU Emacs 22.x, GNU Emacs 23.x
@@ -47,6 +47,7 @@
 ;;
 ;;; Change Log:
 ;;
+;; 2009-04-13 (1.1)
 ;;    Added `highlight-symbol-query-replace'.
 ;;
 ;; 2009-03-19 (1.0.5)
