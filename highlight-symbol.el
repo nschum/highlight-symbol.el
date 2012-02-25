@@ -150,6 +150,25 @@ highlighting the symbols will use these colors in order."
 (defconst highlight-symbol-border-pattern
   (if (>= emacs-major-version 22) '("\\_<" . "\\_>") '("\\<" . "\\>")))
 
+(defun highlight-symbol-get-prompt ()
+  (mapconcat
+   'identity
+   (let (fg bg)
+     (loop for i from 0 below (length highlight-symbol-list)
+           for sym in (reverse highlight-symbol-list)
+           do (save-excursion
+                (save-restriction
+                  (widen)
+                  (goto-char (point-min))
+                  (re-search-forward sym)
+                  (setq bg (cdr (assq 'background-color (get-text-property (1- (point)) 'face))))
+                  (setq fg (cdr (assq 'foreground-color (get-text-property (1- (point)) 'face))))))
+           collect (propertize
+                    (substring sym 3 -3)
+                    'face
+                    (list :background bg :foreground fg))))
+   ", "))
+
 ;;;###autoload
 (define-minor-mode highlight-symbol-mode
   "Minor mode that highlights the symbol under point throughout the buffer.
@@ -167,36 +186,49 @@ Highlighting takes place after `highlight-symbol-idle-delay'."
     (kill-local-variable 'highlight-symbol)))
 
 ;;;###autoload
-(defun highlight-symbol-at-point ()
+(defun highlight-symbol-at-point (arg)
   "Toggle highlighting of the symbol at point.
 This highlights or unhighlights the symbol at point using the first
-element in of `highlight-symbol-faces'."
-  (interactive)
-  (let ((symbol (highlight-symbol-get-symbol)))
-    (unless symbol (error "No symbol at point"))
-    (unless hi-lock-mode (hi-lock-mode 1))
-    (if (member symbol highlight-symbol-list)
-        ;; remove
-        (progn
-          (setq highlight-symbol-list (delete symbol highlight-symbol-list))
-          (hi-lock-unface-buffer symbol))
-      ;; add
-      (when (equal symbol highlight-symbol)
-        (highlight-symbol-mode-remove-temp))
-      (let ((color (nth highlight-symbol-color-index
-                        highlight-symbol-colors)))
-        (if color ;; wrap
-            (incf highlight-symbol-color-index)
-          (setq highlight-symbol-color-index 1
-                color (car highlight-symbol-colors)))
-        (setq color `((background-color . ,color)
-                      (foreground-color . "black")))
-        ;; highlight
-        (with-no-warnings
-          (if (< emacs-major-version 22)
-              (hi-lock-set-pattern `(,symbol (0 (quote ,color) t)))
-            (hi-lock-set-pattern symbol color)))
-        (push symbol highlight-symbol-list)))))
+element in of `highlight-symbol-faces'.
+
+With universal arg (C-u), prompt to remove all highlights."
+  (interactive "P")
+  (if (null arg)
+      (let ((symbol (highlight-symbol-get-symbol)))
+        (unless symbol (error "No symbol at point"))
+        (unless hi-lock-mode (hi-lock-mode 1))
+        (if (member symbol highlight-symbol-list)
+            ;; remove
+            (progn
+              (setq highlight-symbol-list (delete symbol highlight-symbol-list))
+              (hi-lock-unface-buffer symbol))
+          ;; add
+          (when (equal symbol highlight-symbol)
+            (highlight-symbol-mode-remove-temp))
+          (let ((color (nth highlight-symbol-color-index
+                            highlight-symbol-colors)))
+            (if color ;; wrap
+                (incf highlight-symbol-color-index)
+              (setq highlight-symbol-color-index 1
+                    color (car highlight-symbol-colors)))
+            (setq color `((background-color . ,color)
+                          (foreground-color . "black")))
+            ;; highlight
+            (with-no-warnings
+              (if (< emacs-major-version 22)
+                  (hi-lock-set-pattern `(,symbol (0 (quote ,color) t)))
+                (hi-lock-set-pattern symbol color)))
+            (push symbol highlight-symbol-list))))
+    (if (null highlight-symbol-list)
+        (message "No symbols currently highlighted.")
+      (let ((prompt
+             (concat "Unhighlight "
+                     (highlight-symbol-get-prompt)
+                     "? (y/n)" ))
+            (cursor-in-echo-area t)
+            input)
+        (when (eq (upcase (read-char prompt)) ?Y)
+          (highlight-symbol-remove-all))))))
 
 ;;;###autoload
 (defun highlight-symbol-remove-all ()
