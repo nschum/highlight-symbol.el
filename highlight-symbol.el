@@ -153,7 +153,8 @@ highlighting the symbols will use these colors in order."
 (defun highlight-symbol-get-prompt ()
   (mapconcat
    'identity
-   (let (fg bg)
+   (let ((case-fold-search nil)
+         fg bg)
      (loop for i from 0 below (length highlight-symbol-list)
            for sym in (reverse highlight-symbol-list)
            do (save-excursion
