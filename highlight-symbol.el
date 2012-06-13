@@ -81,7 +81,6 @@
 ;;; Code:
 
 (require 'thingatpt)
-(require 'hi-lock)
 (eval-when-compile (require 'cl))
 
 (push "^No symbol at point$" debug-ignored-errors)
@@ -96,7 +95,7 @@
      (:background "gray30"))
     (((class color) (background light))
      (:background "gray90")))
-  "*Face used by `highlight-symbol-mode'."
+  "Face used by `highlight-symbol-mode'."
   :group 'highlight-symbol)
 
 (defvar highlight-symbol-timer nil)
@@ -116,7 +115,7 @@
     (highlight-symbol-update-timer value)))
 
 (defcustom highlight-symbol-idle-delay 1.5
-  "*Number of seconds of idle time before highlighting the current symbol.
+  "Number of seconds of idle time before highlighting the current symbol.
 If this variable is set to 0, no idle time is required.
 Changing this does not take effect until `highlight-symbol-mode' has been
 disabled for all buffers."
@@ -127,16 +126,22 @@ disabled for all buffers."
 (defcustom highlight-symbol-colors
   '("yellow" "DeepPink" "cyan" "MediumPurple1" "SpringGreen1"
     "DarkOrange" "HotPink1" "RoyalBlue1" "OliveDrab")
-  "*Colors used by `highlight-symbol-at-point'.
+  "Colors used by `highlight-symbol-at-point'.
 highlighting the symbols will use these colors in order."
   :type '(repeat color)
   :group 'highlight-symbol)
 
 (defcustom highlight-symbol-on-navigation-p nil
-  "*Wether or not to temporary highlight the symbol when using
+  "Whether or not to temporarily highlight the symbol when using
 `highlight-symbol-jump' family of functions."
   :type 'boolean
   :group 'highlight-symbol)
+
+(defvar highlight-symbol-emacs-face-attributes
+  (append '(:family :foundry :width :height :weight :slant :foreground
+                    :background :underline :strike-through :box
+                    :inverse-video :stipple :font :inherit)
+          (if (< emacs-major-version 20) '(:bold :italic))))
 
 (defvar highlight-symbol-color-index 0)
 (make-variable-buffer-local 'highlight-symbol-color-index)
@@ -157,8 +162,8 @@ Highlighting takes place after `highlight-symbol-idle-delay'."
   nil " hl-s" nil
   (if highlight-symbol-mode
       ;; on
-      (let ((hi-lock-archaic-interface-message-used t))
-        (unless hi-lock-mode (hi-lock-mode 1))
+      (progn
+        (font-lock-mode t)
         (highlight-symbol-update-timer highlight-symbol-idle-delay)
         (add-hook 'post-command-hook 'highlight-symbol-mode-post-command nil t))
     ;; off
@@ -174,12 +179,10 @@ element in of `highlight-symbol-faces'."
   (interactive)
   (let ((symbol (highlight-symbol-get-symbol)))
     (unless symbol (error "No symbol at point"))
-    (unless hi-lock-mode (hi-lock-mode 1))
-    (if (member symbol highlight-symbol-list)
+    (font-lock-mode t)
+    (if (highlight-symbol-highlighted-p symbol)
         ;; remove
-        (progn
-          (setq highlight-symbol-list (delete symbol highlight-symbol-list))
-          (hi-lock-unface-buffer symbol))
+        (highlight-symbol-remove symbol)
       ;; add
       (when (equal symbol highlight-symbol)
         (highlight-symbol-mode-remove-temp))
@@ -189,20 +192,59 @@ element in of `highlight-symbol-faces'."
             (incf highlight-symbol-color-index)
           (setq highlight-symbol-color-index 1
                 color (car highlight-symbol-colors)))
-        (setq color `((background-color . ,color)
-                      (foreground-color . "black")))
+        (setq color `((:background ,color)))
         ;; highlight
         (with-no-warnings
-          (if (< emacs-major-version 22)
-              (hi-lock-set-pattern `(,symbol (0 (quote ,color) t)))
-            (hi-lock-set-pattern symbol color)))
-        (push symbol highlight-symbol-list)))))
+          (highlight-symbol-add symbol color))))))
+
+(defun highlight-symbol-highlighted-p (symbol)
+  "Returns whether SYMBOL is highlighted."
+  (member symbol (mapcar 'car highlight-symbol-list)))
+
+(defun highlight-symbol-get-face-attrs (face)
+  "Returns a plist of the attributes of FACE.
+Ignores attributes with the value \"unspecified\"."
+  (reduce (lambda (result attribute)
+            (let ((attribute-value (face-attribute face attribute)))
+              (if (not (string= attribute-value "unspecified"))
+                  (append result (list attribute attribute-value))
+                result)))
+          highlight-symbol-emacs-face-attributes
+          :initial-value nil))
+
+;;;###autoload
+(defun highlight-symbol-add (symbol face-attrs)
+  "Highlight all instances of SYMBOL.
+FACE-ATTRS should be a plist of face attributes.  For example, this
+value for FACE-ATTRS would result in highlighting all instances of
+SYMBOL with a yellow background: (:background \"yellow\"))."
+  (let ((pattern (list symbol (list 0 (list 'quote face-attrs) 'append))))
+    (push pattern highlight-symbol-list)
+    (font-lock-add-keywords nil (list pattern) t)
+    (font-lock-fontify-buffer)))
+
+;;;###autoload
+(defun highlight-symbol-remove (symbol)
+  "Unhighlight all instances of SYMBOL."
+  ;; unhighlight
+  (mapc (lambda (pattern)
+          (if (string= symbol (car pattern))
+              (progn
+                (font-lock-remove-keywords nil (list pattern))
+                (font-lock-fontify-buffer))))
+        highlight-symbol-list)
+  ;; remove from list
+  (setq highlight-symbol-list
+        (delete-if (lambda (pattern)
+                     (string= symbol (car pattern)))
+                   highlight-symbol-list)))
 
 ;;;###autoload
 (defun highlight-symbol-remove-all ()
   "Remove symbol highlighting in buffer."
   (interactive)
-  (mapc 'hi-lock-unface-buffer highlight-symbol-list)
+  (font-lock-remove-keywords nil highlight-symbol-list)
+  (font-lock-fontify-buffer)
   (setq highlight-symbol-list nil))
 
 ;;;###autoload
@@ -235,7 +277,7 @@ element in of `highlight-symbol-faces'."
 
 ;;;###autoload
 (defun highlight-symbol-query-replace (replacement)
-  "*Replace the symbol at point."
+  "Replace the symbol at point with REPLACEMENT."
   (interactive (let ((symbol (or (thing-at-point 'symbol)
                                  (error "No symbol at point"))))
                  (highlight-symbol-temp-highlight)
@@ -260,16 +302,16 @@ element in of `highlight-symbol-faces'."
   (when highlight-symbol-mode
     (let ((symbol (highlight-symbol-get-symbol)))
       (unless (or (equal symbol highlight-symbol)
-                  (member symbol highlight-symbol-list))
+                  (highlight-symbol-highlighted-p symbol))
         (highlight-symbol-mode-remove-temp)
         (when symbol
           (setq highlight-symbol symbol)
-          (hi-lock-set-pattern symbol 'highlight-symbol-face))))))
+          (highlight-symbol-add symbol (highlight-symbol-get-face-attrs 'highlight-symbol-face)))))))
 
 (defun highlight-symbol-mode-remove-temp ()
   "Remove the temporary symbol highlighting."
   (when highlight-symbol
-    (hi-lock-unface-buffer highlight-symbol)
+    (highlight-symbol-remove highlight-symbol)
     (setq highlight-symbol nil)))
 
 (defun highlight-symbol-mode-post-command ()
