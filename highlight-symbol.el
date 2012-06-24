@@ -198,8 +198,13 @@ element in of `highlight-symbol-faces'."
           (highlight-symbol-add symbol color))))))
 
 (defun highlight-symbol-highlighted-p (symbol)
-  "Returns whether SYMBOL is highlighted."
-  (member symbol (mapcar 'car highlight-symbol-list)))
+  "Returns whether SYMBOL is highlighted.
+Returns nil if SYMBOL is only temporarily highlighted due to
+`highlight-symbol-mode'."
+  (dolist (pattern highlight-symbol-list)
+    (if (and (string= symbol (car pattern))
+             (not (plist-get (cadr (cadadr pattern)) :temp)))
+        (return t))))
 
 (defun highlight-symbol-get-face-attrs (face)
   "Returns a plist of the attributes of FACE.
@@ -213,12 +218,17 @@ Ignores attributes with the value \"unspecified\"."
           :initial-value nil))
 
 ;;;###autoload
-(defun highlight-symbol-add (symbol face-attrs)
-  "Highlight all instances of SYMBOL.
+(defun highlight-symbol-add (symbol face-attrs &optional temp)
+  "Highlight all instances of SYMBOL and add to the list of highlighted symbols.
 FACE-ATTRS should be a plist of face attributes.  For example, this
 value for FACE-ATTRS would result in highlighting all instances of
-SYMBOL with a yellow background: (:background \"yellow\"))."
-  (let ((pattern (list symbol (list 0 (list 'quote face-attrs) 'append))))
+SYMBOL with a yellow background: (:background \"yellow\")).  A non-nil TEMP
+value indicates that the highlight should not be included by
+`highlight-symbol-highlighted-p'."
+  (let ((pattern (list symbol
+                       (list 0
+                             (list 'quote (append face-attrs `(:temp ,temp)))
+                             'append))))
     (push pattern highlight-symbol-list)
     (font-lock-add-keywords nil (list pattern) t)
     (font-lock-fontify-buffer)))
@@ -306,7 +316,10 @@ SYMBOL with a yellow background: (:background \"yellow\"))."
         (highlight-symbol-mode-remove-temp)
         (when symbol
           (setq highlight-symbol symbol)
-          (highlight-symbol-add symbol (highlight-symbol-get-face-attrs 'highlight-symbol-face)))))))
+          (highlight-symbol-add symbol
+                                (highlight-symbol-get-face-attrs
+                                 'highlight-symbol-face)
+                                t))))))
 
 (defun highlight-symbol-mode-remove-temp ()
   "Remove the temporary symbol highlighting."
