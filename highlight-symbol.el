@@ -248,6 +248,16 @@ element in of `highlight-symbol-faces'."
   (goto-char (beginning-of-thing 'symbol))
   (query-replace-regexp (highlight-symbol-get-symbol) replacement))
 
+;;;###autoload
+(defun highlight-symbol-occur (&optional nlines)
+  "Call `occur' with the symbol at point.
+Each line is displayed with NLINES lines before and after, or -NLINES
+before if NLINES is negative."
+  (interactive "P")
+  (if (thing-at-point 'symbol)
+      (occur (highlight-symbol-get-symbol) nlines)
+    (error "No symbol at point")))
+
 (defun highlight-symbol-get-symbol ()
   "Return a regular expression dandifying the symbol at point."
   (let ((symbol (thing-at-point 'symbol)))
