@@ -333,7 +333,8 @@ DIR has to be 1 or -1."
               (goto-char (if (< 0 dir) (point-min) (point-max)))
               (setq target (re-search-forward symbol nil nil dir)))
             (goto-char (+ target offset)))
-          (setq this-command 'highlight-symbol-jump))
+          (setq this-command 'highlight-symbol-jump)
+          (setq regexp-search-ring (cons symbol (delete symbol regexp-search-ring))))
       (error "No symbol at point"))))
 
 (provide 'highlight-symbol)
