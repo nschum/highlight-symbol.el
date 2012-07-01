@@ -162,8 +162,8 @@ highlighting the symbols will use these colors in order."
                   (widen)
                   (goto-char (point-min))
                   (re-search-forward sym)
-                  (setq bg (cdr (assq 'background-color (get-text-property (1- (point)) 'face))))
-                  (setq fg (cdr (assq 'foreground-color (get-text-property (1- (point)) 'face))))))
+                  (setq bg (cdr (assq 'background-color (car (get-char-property-and-overlay (1- (point)) 'face)))))
+                  (setq fg (cdr (assq 'foreground-color (car (get-char-property-and-overlay (1- (point)) 'face)))))))
            collect (propertize
                     (substring sym 3 -3)
                     'face
