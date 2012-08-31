@@ -195,7 +195,11 @@ element in of `highlight-symbol-faces'.
 With universal arg (C-u), prompt to remove all highlights."
   (interactive "P")
   (if (null arg)
-      (let ((symbol (highlight-symbol-get-symbol)))
+      (let ((symbol (if (use-region-p)
+                        (progn
+                          (setq deactivate-mark t)
+                          (regexp-quote (filter-buffer-substring (region-beginning) (region-end))))
+                      (highlight-symbol-get-symbol))))
         (unless symbol (error "No symbol at point"))
         (unless hi-lock-mode (hi-lock-mode 1))
         (if (member symbol highlight-symbol-list)
@@ -268,7 +272,7 @@ With universal arg (C-u), prompt to remove all highlights."
 
 ;;;###autoload
 (defun highlight-symbol-query-replace (replacement)
-  "*Replace the symbol at point."
+  "*Replace the symbol at point."     
   (interactive (let ((symbol (or (thing-at-point 'symbol)
                                  (error "No symbol at point"))))
                  (highlight-symbol-temp-highlight)
@@ -282,11 +286,20 @@ With universal arg (C-u), prompt to remove all highlights."
   (query-replace-regexp (highlight-symbol-get-symbol) replacement))
 
 (defun highlight-symbol-get-symbol ()
-  "Return a regular expression dandifying the symbol at point."
-  (let ((symbol (thing-at-point 'symbol)))
-    (when symbol (concat (car highlight-symbol-border-pattern)
-                         (regexp-quote symbol)
-                         (cdr highlight-symbol-border-pattern)))))
+  "Return current highlit thing at point or failing that,
+return a regular expression dandifying the symbol at point."
+  (let* ((bounds (highlight-symbol-bounds))
+         (beg (car bounds))
+         (end (cdr bounds)))
+    (if (and beg end)
+        (let* ((str (filter-buffer-substring beg end)))
+          (dolist (regex highlight-symbol-list)
+                        (when (string-match regex str)
+                          (return regex))))
+      (let ((symbol (thing-at-point 'symbol)))
+        (when symbol (concat (car highlight-symbol-border-pattern)
+                             (regexp-quote symbol)
+                             (cdr highlight-symbol-border-pattern)))))))
 
 (defun highlight-symbol-temp-highlight ()
   "Highlight the current symbol until a command is executed."
@@ -322,7 +335,7 @@ DIR has to be 1 or -1."
   (let ((symbol (highlight-symbol-get-symbol)))
     (if symbol
         (let* ((case-fold-search nil)
-               (bounds (bounds-of-thing-at-point 'symbol))
+               (bounds (highlight-symbol-bounds))
                (offset (- (point) (if (< 0 dir) (cdr bounds) (car bounds)))))
           (unless (eq last-command 'highlight-symbol-jump)
             (push-mark))
@@ -336,6 +349,19 @@ DIR has to be 1 or -1."
           (setq this-command 'highlight-symbol-jump)
           (setq regexp-search-ring (cons symbol (delete symbol regexp-search-ring))))
       (error "No symbol at point"))))
+
+(defun highlight-symbol-bounds ()
+  "Return cons (beg . end) of bounds of highlit item."
+  (let* ((prop (get-char-property-and-overlay (point) 'face))
+         (fg (and (consp (car prop))
+                  (cdr (assq 'foreground-color (car prop)))))
+         (bg (and (consp (car prop))
+                  (cdr (assq 'background-color (car prop))))))
+    (if (and fg bg)
+        (cons (previous-single-property-change (point) 'face)
+              (next-single-property-change (point) 'face))
+      (cons nil nil))))
+  
 
 (provide 'highlight-symbol)
 
