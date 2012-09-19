@@ -165,7 +165,7 @@ highlighting the symbols will use these colors in order."
                   (setq bg (cdr (assq 'background-color (car (get-char-property-and-overlay (1- (point)) 'face)))))
                   (setq fg (cdr (assq 'foreground-color (car (get-char-property-and-overlay (1- (point)) 'face)))))))
            collect (propertize
-                    (substring sym 3 -3)
+                    sym
                     'face
                     (list :background bg :foreground fg))))
    ", "))
