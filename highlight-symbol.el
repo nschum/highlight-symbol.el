@@ -162,8 +162,12 @@ highlighting the symbols will use these colors in order."
                   (widen)
                   (goto-char (point-min))
                   (re-search-forward sym)
-                  (setq bg (cdr (assq 'background-color (car (get-char-property-and-overlay (1- (point)) 'face)))))
-                  (setq fg (cdr (assq 'foreground-color (car (get-char-property-and-overlay (1- (point)) 'face)))))))
+                  (let ((face-setting (car (get-char-property-and-overlay (1- (point)) 'face))))
+                    (if (listp face-setting)
+                        (setq bg (cdr (assq 'background-color face-setting))
+                              fg (cdr (assq 'foreground-color face-setting)))
+                      (setq bg nil
+                            fg nil)))))
            collect (propertize
                     sym
                     'face
