@@ -157,21 +157,22 @@ highlighting the symbols will use these colors in order."
          fg bg)
      (loop for i from 0 below (length highlight-symbol-list)
            for sym in (reverse highlight-symbol-list)
-           do (save-excursion
-                (save-restriction
-                  (widen)
-                  (goto-char (point-min))
-                  (re-search-forward sym)
-                  (let ((face-setting (car (get-char-property-and-overlay (1- (point)) 'face))))
-                    (if (listp face-setting)
-                        (setq bg (cdr (assq 'background-color face-setting))
-                              fg (cdr (assq 'foreground-color face-setting)))
-                      (setq bg nil
-                            fg nil)))))
-           collect (propertize
-                    sym
-                    'face
-                    (list :background bg :foreground fg))))
+           collect (save-excursion
+                     (save-restriction
+                       (widen)
+                       (goto-char (point-min))
+                       (if (re-search-forward sym nil 'no-error)
+                           (let ((face-setting (car (get-char-property-and-overlay (1- (point)) 'face))))
+                             (if (listp face-setting)
+                                 (setq bg (cdr (assq 'background-color face-setting))
+                                       fg (cdr (assq 'foreground-color face-setting)))
+                               (setq bg nil
+                                     fg nil))
+                             (propertize
+                              sym
+                              'face
+                              (list :background bg :foreground fg)))
+                         (format "(missing: %s)" sym))))))
    ", "))
 
 ;;;###autoload
