@@ -179,27 +179,30 @@ element in of `highlight-symbol-faces'."
     (unless symbol (error "No symbol at point"))
     (unless hi-lock-mode (hi-lock-mode 1))
     (if (member symbol highlight-symbol-list)
-        ;; remove
-        (progn
-          (setq highlight-symbol-list (delete symbol highlight-symbol-list))
-          (hi-lock-unface-buffer symbol))
-      ;; add
-      (when (equal symbol highlight-symbol)
-        (highlight-symbol-mode-remove-temp))
-      (let ((color (nth highlight-symbol-color-index
-                        highlight-symbol-colors)))
-        (if color ;; wrap
-            (incf highlight-symbol-color-index)
-          (setq highlight-symbol-color-index 1
-                color (car highlight-symbol-colors)))
-        (setq color `((background-color . ,color)
-                      (foreground-color . "black")))
-        ;; highlight
-        (with-no-warnings
-          (if (< emacs-major-version 22)
-              (hi-lock-set-pattern `(,symbol (0 (quote ,color) t)))
-            (hi-lock-set-pattern symbol color)))
-        (push symbol highlight-symbol-list)))))
+        (highlight-symbol-remove-symbol symbol)
+      (highlight-symbol-add-symbol symbol))))
+
+(defun highlight-symbol-add-symbol (symbol)
+  (when (equal symbol highlight-symbol)
+    (highlight-symbol-mode-remove-temp))
+  (let ((color (nth highlight-symbol-color-index
+                    highlight-symbol-colors)))
+    (if color ;; wrap
+        (incf highlight-symbol-color-index)
+      (setq highlight-symbol-color-index 1
+            color (car highlight-symbol-colors)))
+    (setq color `((background-color . ,color)
+                  (foreground-color . "black")))
+    ;; highlight
+    (with-no-warnings
+      (if (< emacs-major-version 22)
+          (hi-lock-set-pattern `(,symbol (0 (quote ,color) t)))
+        (hi-lock-set-pattern symbol color)))
+    (push symbol highlight-symbol-list)))
+
+(defun highlight-symbol-remove-symbol (symbol)
+  (setq highlight-symbol-list (delete symbol highlight-symbol-list))
+  (hi-lock-unface-buffer symbol))
 
 ;;;###autoload
 (defun highlight-symbol-remove-all ()
