@@ -225,7 +225,10 @@ element in of `highlight-symbol-faces'."
   (message "%s" (mapconcat 'highlight-symbol-fontify-symbol highlight-symbol-list ", ")))
 
 (defun highlight-symbol-fontify-symbol (symbol)
-  (propertize symbol 'face (assoc symbol (highlight-symbol-uncompiled-keywords))))
+  (let ((prefix-length (length (car highlight-symbol-border-pattern)))
+        (suffix-length (length (cdr highlight-symbol-border-pattern))))
+    (propertize (substring symbol prefix-length (- (length symbol) suffix-length))
+                'face (assoc symbol (highlight-symbol-uncompiled-keywords)))))
 
 ;;;###autoload
 (defun highlight-symbol-next ()
