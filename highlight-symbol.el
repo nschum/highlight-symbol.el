@@ -98,7 +98,7 @@
      (:background "gray30"))
     (((class color) (background light))
      (:background "gray90")))
-  "*Face used by `highlight-symbol-mode'."
+  "Face used by `highlight-symbol-mode'."
   :group 'highlight-symbol)
 
 (defvar highlight-symbol-timer nil)
@@ -118,7 +118,7 @@
     (highlight-symbol-update-timer value)))
 
 (defcustom highlight-symbol-idle-delay 1.5
-  "*Number of seconds of idle time before highlighting the current symbol.
+  "Number of seconds of idle time before highlighting the current symbol.
 If this variable is set to 0, no idle time is required.
 Changing this does not take effect until `highlight-symbol-mode' has been
 disabled for all buffers."
@@ -129,13 +129,13 @@ disabled for all buffers."
 (defcustom highlight-symbol-colors
   '("yellow" "DeepPink" "cyan" "MediumPurple1" "SpringGreen1"
     "DarkOrange" "HotPink1" "RoyalBlue1" "OliveDrab")
-  "*Colors used by `highlight-symbol-at-point'.
+  "Colors used by `highlight-symbol-at-point'.
 highlighting the symbols will use these colors in order."
   :type '(repeat color)
   :group 'highlight-symbol)
 
 (defcustom highlight-symbol-on-navigation-p nil
-  "*Wether or not to temporary highlight the symbol when using
+  "Wether or not to temporary highlight the symbol when using
 `highlight-symbol-jump' family of functions."
   :type 'boolean
   :group 'highlight-symbol)
@@ -237,7 +237,7 @@ element in of `highlight-symbol-faces'."
 
 ;;;###autoload
 (defun highlight-symbol-query-replace (replacement)
-  "*Replace the symbol at point."
+  "Replace the symbol at point with REPLACEMENT."
   (interactive (let ((symbol (or (thing-at-point 'symbol)
                                  (error "No symbol at point"))))
                  (highlight-symbol-temp-highlight)
