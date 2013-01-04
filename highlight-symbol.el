@@ -47,6 +47,8 @@
 ;;
 ;;; Change Log:
 ;;
+;;    Added `highlight-symbol-occur`.  (thanks to Jim Turner)
+;;
 ;; 2009-04-13 (1.1)
 ;;    Added `highlight-symbol-query-replace'.
 ;;
