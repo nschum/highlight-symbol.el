@@ -135,7 +135,7 @@ highlighting the symbols will use these colors in order."
   :group 'highlight-symbol)
 
 (defcustom highlight-symbol-on-navigation-p nil
-  "Wether or not to temporary highlight the symbol when using
+  "Whether or not to temporarily highlight the symbol when using
 `highlight-symbol-jump' family of functions."
   :type 'boolean
   :group 'highlight-symbol)
@@ -261,7 +261,7 @@ before if NLINES is negative."
     (error "No symbol at point")))
 
 (defun highlight-symbol-get-symbol ()
-  "Return a regular expression dandifying the symbol at point."
+  "Return a regular expression identifying the symbol at point."
   (let ((symbol (thing-at-point 'symbol)))
     (when symbol (concat (car highlight-symbol-border-pattern)
                          (regexp-quote symbol)
