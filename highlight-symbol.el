@@ -208,8 +208,7 @@ element in of `highlight-symbol-faces'."
 (defun highlight-symbol-remove-all ()
   "Remove symbol highlighting in buffer."
   (interactive)
-  (mapc 'hi-lock-unface-buffer highlight-symbol-list)
-  (setq highlight-symbol-list nil))
+  (mapc 'highlight-symbol-remove-symbol highlight-symbol-list))
 
 ;;;###autoload
 (defun highlight-symbol-list-all ()
