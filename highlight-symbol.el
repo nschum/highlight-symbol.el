@@ -47,6 +47,7 @@
 ;;
 ;;; Change Log:
 ;;
+;;    Added `highlight-symbol-list-all`.  (thanks to lewang)
 ;;    Added `highlight-symbol-occur`.  (thanks to Jim Turner)
 ;;
 ;; 2009-04-13 (1.1)
@@ -206,6 +207,20 @@ element in of `highlight-symbol-faces'."
   (interactive)
   (mapc 'hi-lock-unface-buffer highlight-symbol-list)
   (setq highlight-symbol-list nil))
+
+;;;###autoload
+(defun highlight-symbol-list-all ()
+  "List all symbols highlighted in the buffer."
+  (interactive)
+  (message "%s" (mapconcat 'highlight-symbol-fontify-symbol highlight-symbol-list ", ")))
+
+(defun highlight-symbol-fontify-symbol (symbol)
+  (save-excursion
+    (save-restriction
+      (widen)
+      (goto-char (point-min))
+      (re-search-forward symbol)
+      (match-string 0))))
 
 ;;;###autoload
 (defun highlight-symbol-next ()
