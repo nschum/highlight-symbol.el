@@ -47,6 +47,8 @@
 ;;
 ;;; Change Log:
 ;;
+;;    Added `highlight-symbol-occur`.  (thanks to Jim Turner)
+;;
 ;; 2009-04-13 (1.1)
 ;;    Added `highlight-symbol-query-replace'.
 ;;
@@ -247,6 +249,16 @@ element in of `highlight-symbol-faces'."
                                         query-replace-to-history-variable))))
   (goto-char (beginning-of-thing 'symbol))
   (query-replace-regexp (highlight-symbol-get-symbol) replacement))
+
+;;;###autoload
+(defun highlight-symbol-occur (&optional nlines)
+  "Call `occur' with the symbol at point.
+Each line is displayed with NLINES lines before and after, or -NLINES
+before if NLINES is negative."
+  (interactive "P")
+  (if (thing-at-point 'symbol)
+      (occur (highlight-symbol-get-symbol) nlines)
+    (error "No symbol at point")))
 
 (defun highlight-symbol-get-symbol ()
   "Return a regular expression dandifying the symbol at point."
