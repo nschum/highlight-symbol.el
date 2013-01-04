@@ -129,9 +129,9 @@ disabled for all buffers."
 (defcustom highlight-symbol-colors
   '("yellow" "DeepPink" "cyan" "MediumPurple1" "SpringGreen1"
     "DarkOrange" "HotPink1" "RoyalBlue1" "OliveDrab")
-  "Colors used by `highlight-symbol-at-point'.
-highlighting the symbols will use these colors in order."
-  :type '(repeat color)
+  "Colors and/or faces used by `highlight-symbol-at-point'.
+highlighting the symbols will use these colors/faces in order."
+  :type '(repeat (choice color face))
   :group 'highlight-symbol)
 
 (defcustom highlight-symbol-on-navigation-p nil
@@ -188,8 +188,9 @@ element in of `highlight-symbol-faces'."
         (incf highlight-symbol-color-index)
       (setq highlight-symbol-color-index 1
             color (car highlight-symbol-colors)))
-    (setq color `((background-color . ,color)
-                  (foreground-color . "black")))
+    (unless (facep color)
+      (setq color `((background-color . ,color)
+                    (foreground-color . "black"))))
     ;; highlight
     (highlight-symbol-add-symbol-with-face symbol color)
     (push symbol highlight-symbol-list)))
