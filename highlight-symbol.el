@@ -225,12 +225,7 @@ element in of `highlight-symbol-faces'."
   (message "%s" (mapconcat 'highlight-symbol-fontify-symbol highlight-symbol-list ", ")))
 
 (defun highlight-symbol-fontify-symbol (symbol)
-  (save-excursion
-    (save-restriction
-      (widen)
-      (goto-char (point-min))
-      (re-search-forward symbol)
-      (match-string 0))))
+  (propertize symbol 'face (assoc symbol (highlight-symbol-uncompiled-keywords))))
 
 ;;;###autoload
 (defun highlight-symbol-next ()
