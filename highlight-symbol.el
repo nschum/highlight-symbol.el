@@ -84,7 +84,6 @@
 ;;; Code:
 
 (require 'thingatpt)
-(require 'hi-lock)
 (eval-when-compile (require 'cl))
 
 (push "^No symbol at point$" debug-ignored-errors)
@@ -160,8 +159,7 @@ Highlighting takes place after `highlight-symbol-idle-delay'."
   nil " hl-s" nil
   (if highlight-symbol-mode
       ;; on
-      (let ((hi-lock-archaic-interface-message-used t))
-        (unless hi-lock-mode (hi-lock-mode 1))
+      (progn
         (highlight-symbol-update-timer highlight-symbol-idle-delay)
         (add-hook 'post-command-hook 'highlight-symbol-mode-post-command nil t))
     ;; off
@@ -177,7 +175,6 @@ element in of `highlight-symbol-faces'."
   (interactive)
   (let ((symbol (highlight-symbol-get-symbol)))
     (unless symbol (error "No symbol at point"))
-    (unless hi-lock-mode (hi-lock-mode 1))
     (if (member symbol highlight-symbol-list)
         (highlight-symbol-remove-symbol symbol)
       (highlight-symbol-add-symbol symbol))))
@@ -194,15 +191,23 @@ element in of `highlight-symbol-faces'."
     (setq color `((background-color . ,color)
                   (foreground-color . "black")))
     ;; highlight
-    (with-no-warnings
-      (if (< emacs-major-version 22)
-          (hi-lock-set-pattern `(,symbol (0 (quote ,color) t)))
-        (hi-lock-set-pattern symbol color)))
+    (highlight-symbol-add-symbol-with-face symbol color)
     (push symbol highlight-symbol-list)))
+
+(defun highlight-symbol-add-symbol-with-face (symbol face)
+  (font-lock-add-keywords nil `((,symbol 0 ',face prepend)) 'append)
+  (font-lock-fontify-buffer))
 
 (defun highlight-symbol-remove-symbol (symbol)
   (setq highlight-symbol-list (delete symbol highlight-symbol-list))
-  (hi-lock-unface-buffer symbol))
+  (let ((keywords (assoc symbol (highlight-symbol-uncompiled-keywords))))
+    (font-lock-remove-keywords nil (list keywords))
+    (font-lock-fontify-buffer)))
+
+(defun highlight-symbol-uncompiled-keywords ()
+  (if (eq t (car font-lock-keywords))
+      (cadr font-lock-keywords)
+    font-lock-keywords))
 
 ;;;###autoload
 (defun highlight-symbol-remove-all ()
@@ -293,12 +298,13 @@ before if NLINES is negative."
         (highlight-symbol-mode-remove-temp)
         (when symbol
           (setq highlight-symbol symbol)
-          (hi-lock-set-pattern symbol 'highlight-symbol-face))))))
+          (highlight-symbol-add-symbol-with-face symbol 'highlight-symbol-face)
+          (font-lock-fontify-buffer))))))
 
 (defun highlight-symbol-mode-remove-temp ()
   "Remove the temporary symbol highlighting."
   (when highlight-symbol
-    (hi-lock-unface-buffer highlight-symbol)
+    (highlight-symbol-remove-symbol highlight-symbol)
     (setq highlight-symbol nil)))
 
 (defun highlight-symbol-mode-post-command ()
