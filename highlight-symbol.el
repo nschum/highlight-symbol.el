@@ -47,6 +47,8 @@
 ;;
 ;;; Change Log:
 ;;
+;;    `highlight-symbol-colors` may now contain faces in addition to colors.
+;;    No longer depend on hi-lock (to support the latest Emacs 24).
 ;;    Added `highlight-symbol-list-all`.  (thanks to lewang)
 ;;    Added `highlight-symbol-occur`.  (thanks to Jim Turner)
 ;;
