@@ -186,20 +186,21 @@ element in of `highlight-symbol-faces'."
   (member symbol highlight-symbol-list))
 
 (defun highlight-symbol-add-symbol (symbol)
-  (when (equal symbol highlight-symbol)
-    (highlight-symbol-mode-remove-temp))
-  (let ((color (nth highlight-symbol-color-index
-                    highlight-symbol-colors)))
-    (if color ;; wrap
-        (incf highlight-symbol-color-index)
-      (setq highlight-symbol-color-index 1
-            color (car highlight-symbol-colors)))
-    (unless (facep color)
-      (setq color `((background-color . ,color)
-                    (foreground-color . "black"))))
-    ;; highlight
-    (highlight-symbol-add-symbol-with-face symbol color)
-    (push symbol highlight-symbol-list)))
+  (unless (highlight-symbol-symbol-highlighted-p symbol)
+    (when (equal symbol highlight-symbol)
+      (highlight-symbol-mode-remove-temp))
+    (let ((color (nth highlight-symbol-color-index
+                      highlight-symbol-colors)))
+      (if color ;; wrap
+          (incf highlight-symbol-color-index)
+        (setq highlight-symbol-color-index 1
+              color (car highlight-symbol-colors)))
+      (unless (facep color)
+        (setq color `((background-color . ,color)
+                      (foreground-color . "black"))))
+      ;; highlight
+      (highlight-symbol-add-symbol-with-face symbol color)
+      (push symbol highlight-symbol-list))))
 
 (defun highlight-symbol-add-symbol-with-face (symbol face)
   (font-lock-add-keywords nil `((,symbol 0 ',face prepend)) 'append)
