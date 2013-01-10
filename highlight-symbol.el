@@ -3,7 +3,7 @@
 ;; Copyright (C) 2007-2009, 2013 Nikolaj Schumacher
 ;;
 ;; Author: Nikolaj Schumacher <bugs * nschum de>
-;; Version: 1.1
+;; Version: 1.2
 ;; Keywords: faces, matching
 ;; URL: http://nschum.de/src/emacs/highlight-symbol/
 ;; Compatibility: GNU Emacs 22.x, GNU Emacs 23.x, GNU Emacs 24.x
@@ -47,6 +47,7 @@
 ;;
 ;;; Change Log:
 ;;
+;; 2013-01-10 (1.2)
 ;;    `highlight-symbol-colors` may now contain faces in addition to colors.
 ;;    No longer depend on hi-lock (to support the latest Emacs 24).
 ;;    Added `highlight-symbol-list-all`.  (thanks to lewang)
