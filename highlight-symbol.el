@@ -177,9 +177,13 @@ element in of `highlight-symbol-faces'."
   (interactive)
   (let ((symbol (highlight-symbol-get-symbol)))
     (unless symbol (error "No symbol at point"))
-    (if (member symbol highlight-symbol-list)
+    (if (highlight-symbol-symbol-highlighted-p symbol)
         (highlight-symbol-remove-symbol symbol)
       (highlight-symbol-add-symbol symbol))))
+
+(defun highlight-symbol-symbol-highlighted-p (symbol)
+  "Test if the a symbol regexp is currently highlighted."
+  (member symbol highlight-symbol-list))
 
 (defun highlight-symbol-add-symbol (symbol)
   (when (equal symbol highlight-symbol)
@@ -295,7 +299,7 @@ before if NLINES is negative."
   (when highlight-symbol-mode
     (let ((symbol (highlight-symbol-get-symbol)))
       (unless (or (equal symbol highlight-symbol)
-                  (member symbol highlight-symbol-list))
+                  (highlight-symbol-symbol-highlighted-p symbol))
         (highlight-symbol-mode-remove-temp)
         (when symbol
           (setq highlight-symbol symbol)
