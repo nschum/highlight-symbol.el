@@ -155,6 +155,11 @@ highlighting the symbols will use these colors/faces in order."
 (defconst highlight-symbol-border-pattern
   (if (>= emacs-major-version 22) '("\\_<" . "\\_>") '("\\<" . "\\>")))
 
+(defcustom highlight-symbol-foreground-color "black"
+  "*Foreground color of highlighted symbols."
+  :type 'string
+  :group 'highlight-symbol)
+
 ;;;###autoload
 (define-minor-mode highlight-symbol-mode
   "Minor mode that highlights the symbol under point throughout the buffer.
@@ -198,7 +203,7 @@ element in of `highlight-symbol-faces'."
               color (car highlight-symbol-colors)))
       (unless (facep color)
         (setq color `((background-color . ,color)
-                      (foreground-color . "black"))))
+                      (foreground-color . ,highlight-symbol-foreground-color))))
       ;; highlight
       (highlight-symbol-add-symbol-with-face symbol color)
       (push symbol highlight-symbol-list))))
