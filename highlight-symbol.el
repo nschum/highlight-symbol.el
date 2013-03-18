@@ -157,7 +157,8 @@ highlighting the symbols will use these colors/faces in order."
 
 (defcustom highlight-symbol-foreground-color "black"
   "*Foreground color of highlighted symbols."
-  :type 'string
+  :type '(choice color
+                 (const :tag "Keep original text color" nil))
   :group 'highlight-symbol)
 
 ;;;###autoload
