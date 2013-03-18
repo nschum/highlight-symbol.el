@@ -47,6 +47,8 @@
 ;;
 ;;; Change Log:
 ;;
+;;    Added `highlight-symbol-foreground-color'.  (thanks to rubikitch)
+;;
 ;; 2013-01-10 (1.2)
 ;;    `highlight-symbol-colors` may now contain faces in addition to colors.
 ;;    No longer depend on hi-lock (to support the latest Emacs 24).
