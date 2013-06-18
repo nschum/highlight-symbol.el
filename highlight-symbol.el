@@ -248,13 +248,13 @@ element in of `highlight-symbol-faces'."
 
 ;;;###autoload
 (defun highlight-symbol-next ()
-  "Jump to the next location of the symbol at point within the function."
+  "Jump to the next location of the symbol at point within the buffer."
   (interactive)
   (highlight-symbol-jump 1))
 
 ;;;###autoload
 (defun highlight-symbol-prev ()
-  "Jump to the previous location of the symbol at point within the function."
+  "Jump to the previous location of the symbol at point within the buffer."
   (interactive)
   (highlight-symbol-jump -1))
 
