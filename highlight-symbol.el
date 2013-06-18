@@ -236,12 +236,14 @@ element in of `highlight-symbol-faces'."
 (defun highlight-symbol-list-all ()
   "List all symbols highlighted in the buffer."
   (interactive)
-  (message "%s" (mapconcat 'highlight-symbol-fontify-symbol highlight-symbol-list ", ")))
+  (message "%s" (mapconcat 'highlight-symbol-fontify-symbol
+                           highlight-symbol-list ", ")))
 
 (defun highlight-symbol-fontify-symbol (symbol)
   (let ((prefix-length (length (car highlight-symbol-border-pattern)))
         (suffix-length (length (cdr highlight-symbol-border-pattern))))
-    (propertize (substring symbol prefix-length (- (length symbol) suffix-length))
+    (propertize (substring symbol prefix-length
+                           (- (length symbol) suffix-length))
                 'face (assoc symbol (highlight-symbol-uncompiled-keywords)))))
 
 ;;;###autoload
