@@ -350,6 +350,7 @@ DIR has to be 1 or -1."
           (let ((target (re-search-forward symbol nil t dir)))
             (unless target
               (goto-char (if (< 0 dir) (point-min) (point-max)))
+              (message "Continued from beginning of buffer")
               (setq target (re-search-forward symbol nil nil dir)))
             (goto-char (+ target offset)))
           (setq this-command 'highlight-symbol-jump))
