@@ -47,6 +47,7 @@
 ;;
 ;;; Change Log:
 ;;
+;;    Added `highlight-symbol-next-highlighted`.
 ;;    Added `highlight-symbol-foreground-color'.  (thanks to rubikitch)
 ;;
 ;; 2013-01-10 (1.2)
@@ -275,6 +276,18 @@ element in of `highlight-symbol-faces'."
     (highlight-symbol-jump -1)))
 
 ;;;###autoload
+(defun highlight-symbol-next-highlighted ()
+  "Jump to the next highlighted symbol after point within the buffer."
+  (interactive)
+  (highlight-symbol-jump 1 (mapconcat 'identity highlight-symbol-list "\\|")))
+
+;;;###autoload
+(defun highlight-symbol-prev-highlighted ()
+  "Jump to the previous highlighted symbol before point within the buffer."
+  (interactive)
+  (highlight-symbol-jump -1 (mapconcat 'identity highlight-symbol-list "\\|")))
+
+;;;###autoload
 (defun highlight-symbol-query-replace (replacement)
   "Replace the symbol at point with REPLACEMENT."
   (interactive (let ((symbol (or (thing-at-point 'symbol)
@@ -335,26 +348,34 @@ create the new one."
         (highlight-symbol-temp-highlight)
       (highlight-symbol-mode-remove-temp))))
 
-(defun highlight-symbol-jump (dir)
+(defun highlight-symbol-jump (dir &optional regexp)
   "Jump to the next or previous occurence of the symbol at point.
 DIR has to be 1 or -1."
-  (let ((symbol (highlight-symbol-get-symbol)))
-    (if symbol
-        (let* ((case-fold-search nil)
-               (bounds (bounds-of-thing-at-point 'symbol))
-               (offset (- (point) (if (< 0 dir) (cdr bounds) (car bounds)))))
-          (unless (eq last-command 'highlight-symbol-jump)
-            (push-mark))
-          ;; move a little, so we don't find the same instance again
-          (goto-char (- (point) offset))
-          (let ((target (re-search-forward symbol nil t dir)))
-            (unless target
-              (goto-char (if (< 0 dir) (point-min) (point-max)))
-              (message "Continued from beginning of buffer")
-              (setq target (re-search-forward symbol nil nil dir)))
-            (goto-char (+ target offset)))
-          (setq this-command 'highlight-symbol-jump))
-      (error "No symbol at point"))))
+  (let ((case-fold-search nil)
+        (offset 0))
+
+    ;; default to symbol at point
+    (unless regexp
+      (setq regexp (or (highlight-symbol-get-symbol)
+                       (error "No symbol at point")))
+      (let ((bounds (bounds-of-thing-at-point 'symbol)))
+        (setq offset (- (point) (if (< 0 dir) (cdr bounds) (car bounds))))))
+
+    (unless (eq last-command 'highlight-symbol-jump)
+      (push-mark))
+
+    ;; move a little, so we don't find the same instance again
+    ;;(goto-char (- (point) offset))
+    (goto-char (+ (point) dir))
+
+    (let ((target (re-search-forward regexp nil t dir)))
+      (unless target
+        (goto-char (if (< 0 dir) (point-min) (point-max)))
+        (message "Continued from beginning of buffer")
+        (setq target (re-search-forward regexp nil nil dir)))
+      (goto-char (+ target offset)))
+    (setq this-command 'highlight-symbol-jump)))
+
 
 (provide 'highlight-symbol)
 
