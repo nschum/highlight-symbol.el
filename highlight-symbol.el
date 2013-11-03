@@ -38,10 +38,10 @@
 ;;
 ;; The functions `highlight-symbol-next', `highlight-symbol-prev',
 ;; `highlight-symbol-next-in-defun' and `highlight-symbol-prev-in-defun' allow
-;; for cycling through the locations of any symbol at point.
-;; When `highlight-symbol-on-navigation-p' is set, highlighting is triggered
-;; regardless of `highlight-symbol-idle-delay'.  Use `highlight-symbol-nav-mode'
-;; to enable key bindings for navigation.
+;; for cycling through the locations of any symbol at point.  Use
+;; `highlight-symbol-nav-mode' to enable key bindings (M-p and M-p) for
+;; navigation. When `highlight-symbol-on-navigation-p' is set, highlighting is
+;; triggered regardless of `highlight-symbol-idle-delay'.
 ;;
 ;; `highlight-symbol-query-replace' can be used to replace the symbol.
 ;;
