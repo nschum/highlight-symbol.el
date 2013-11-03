@@ -38,14 +38,16 @@
 ;;
 ;; The functions `highlight-symbol-next', `highlight-symbol-prev',
 ;; `highlight-symbol-next-in-defun' and `highlight-symbol-prev-in-defun' allow
-;; for cycling through the locations of any symbol at point.
-;; When `highlight-symbol-on-navigation-p' is set, highlighting is triggered
-;; regardless of `highlight-symbol-idle-delay'.
+;; for cycling through the locations of any symbol at point.  Use
+;; `highlight-symbol-nav-mode' to enable key bindings (M-p and M-p) for
+;; navigation. When `highlight-symbol-on-navigation-p' is set, highlighting is
+;; triggered regardless of `highlight-symbol-idle-delay'.
 ;;
 ;; `highlight-symbol-query-replace' can be used to replace the symbol.
 ;;
 ;;; Change Log:
 ;;
+;;    Added `highlight-symbol-nav-mode'.  (thanks to Sebastian Wiesner)
 ;;    Added `highlight-symbol-foreground-color'.  (thanks to rubikitch)
 ;;
 ;; 2013-01-10 (1.2)
@@ -272,6 +274,32 @@ element in of `highlight-symbol-faces'."
   (save-restriction
     (narrow-to-defun)
     (highlight-symbol-jump -1)))
+
+(defvar highlight-symbol-nav-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "\M-n" 'highlight-symbol-next)
+    (define-key map "\M-p" 'highlight-symbol-prev)
+    map)
+  "Keymap for `highlight-symbol-nav-mode'.")
+
+;;;###autoload
+(define-minor-mode highlight-symbol-nav-mode
+  "Navigate occurrences of the symbol at point.
+
+When called interactively, toggle `highlight-symbol-nav-mode'.
+With prefix ARG, enable `highlight-symbol-nav-mode' if ARG is
+positive, otherwise disable it.
+
+When called from Lisp, enable `highlight-symbol-nav-mode' if ARG
+is omitted, nil or positive.  If ARG is `toggle', toggle
+`highlight-symbol-nav-mode'.  Otherwise behave as if called
+interactively.
+
+In `highlight-symbol-nav-mode' provide the following key bindings
+to navigate between occurrences of the symbol at point in the
+current buffer.
+
+\\{highlight-symbol-nav-mode-map}")
 
 ;;;###autoload
 (defun highlight-symbol-query-replace (replacement)
