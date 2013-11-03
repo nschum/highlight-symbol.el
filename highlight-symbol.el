@@ -276,8 +276,8 @@ element in of `highlight-symbol-faces'."
 
 (defvar highlight-symbol-nav-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "M-n") #'highlight-symbol-next)
-    (define-key map (kbd "M-p") #'highlight-symbol-prev)
+    (define-key map "\M-n" 'highlight-symbol-next)
+    (define-key map "\M-p" 'highlight-symbol-prev)
     map)
   "Keymap for `highlight-symbol-nav-mode'.")
 
