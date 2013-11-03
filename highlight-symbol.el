@@ -47,6 +47,7 @@
 ;;
 ;;; Change Log:
 ;;
+;;    Added `highlight-symbol-nav-mode'.  (thanks to Sebastian Wiesner)
 ;;    Added `highlight-symbol-foreground-color'.  (thanks to rubikitch)
 ;;
 ;; 2013-01-10 (1.2)
