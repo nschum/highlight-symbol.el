@@ -360,7 +360,8 @@ create the new one."
         (highlight-symbol-temp-highlight))
     (if (eql highlight-symbol-idle-delay 0)
         (highlight-symbol-temp-highlight)
-      (highlight-symbol-mode-remove-temp))))
+      (unless (equal highlight-symbol (highlight-symbol-get-symbol))
+        (highlight-symbol-mode-remove-temp)))))
 
 (defun highlight-symbol-jump (dir)
   "Jump to the next or previous occurence of the symbol at point.
