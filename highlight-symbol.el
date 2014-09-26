@@ -326,12 +326,19 @@ before if NLINES is negative."
       (occur (highlight-symbol-get-symbol) nlines)
     (error "No symbol at point")))
 
+(defun string-integer-p (string)
+  "Test if given string is integer"
+  (if (string-match "\\`[-+]?[0-9]+\\'" string)
+      t
+    nil))
+
 (defun highlight-symbol-get-symbol ()
   "Return a regular expression identifying the symbol at point."
   (let ((symbol (thing-at-point 'symbol)))
-    (when symbol (concat (car highlight-symbol-border-pattern)
-                         (regexp-quote symbol)
-                         (cdr highlight-symbol-border-pattern)))))
+    (when (and symbol (not (string-integer-p symbol)))
+      (concat (car highlight-symbol-border-pattern)
+	      (regexp-quote symbol)
+	      (cdr highlight-symbol-border-pattern)))))
 
 (defun highlight-symbol-temp-highlight ()
   "Highlight the current symbol until a command is executed."
