@@ -146,6 +146,11 @@ highlighting the symbols will use these colors/faces in order."
   :type 'boolean
   :group 'highlight-symbol)
 
+(defcustom highlight-symbol-highlight-numbers-p t
+  "Whether or not to highlight numbers."
+  :type 'boolean
+  :group 'highlight-symbol)
+
 (defvar highlight-symbol-color-index 0)
 (make-variable-buffer-local 'highlight-symbol-color-index)
 
@@ -326,16 +331,12 @@ before if NLINES is negative."
       (occur (highlight-symbol-get-symbol) nlines)
     (error "No symbol at point")))
 
-(defun string-integer-p (string)
-  "Test if given string is integer"
-  (if (string-match "\\`[-+]?[0-9]+\\'" string)
-      t
-    nil))
-
 (defun highlight-symbol-get-symbol ()
   "Return a regular expression identifying the symbol at point."
   (let ((symbol (thing-at-point 'symbol)))
-    (when (and symbol (not (string-integer-p symbol)))
+    (when (and symbol
+               (or (not highlight-symbol-highlight-numbers-p)
+                   (not (string-match "\\`[0-9]+f?F?[ulUL]*\\'" symbol))))
       (concat (car highlight-symbol-border-pattern)
 	      (regexp-quote symbol)
 	      (cdr highlight-symbol-border-pattern)))))
