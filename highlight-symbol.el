@@ -146,9 +146,9 @@ highlighting the symbols will use these colors/faces in order."
   :type 'boolean
   :group 'highlight-symbol)
 
-(defcustom highlight-symbol-highlight-numbers-p t
-  "Whether or not to highlight numbers."
-  :type 'boolean
+(defcustom highlight-symbol-ignore-list '()
+  "List of exceptions (Regex)."
+  :type '(repeat string)
   :group 'highlight-symbol)
 
 (defvar highlight-symbol-color-index 0)
@@ -335,8 +335,9 @@ before if NLINES is negative."
   "Return a regular expression identifying the symbol at point."
   (let ((symbol (thing-at-point 'symbol)))
     (when (and symbol
-               (or (not highlight-symbol-highlight-numbers-p)
-                   (not (string-match "\\`[0-9]+f?F?[ulUL]*\\'" symbol))))
+	       (not (member 0 (mapcar
+			       (lambda (e) (string-match e symbol))
+			       highlight-symbol-ignore-list))))
       (concat (car highlight-symbol-border-pattern)
 	      (regexp-quote symbol)
 	      (cdr highlight-symbol-border-pattern)))))
