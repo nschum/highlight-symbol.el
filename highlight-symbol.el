@@ -326,6 +326,19 @@ before if NLINES is negative."
       (occur (highlight-symbol-get-symbol) nlines)
     (error "No symbol at point")))
 
+;;;###autoload
+(defun highlight-symbol-ag ()
+  "Call `ag-project-regexp' with the symbol at point.
+
+Needs ag.el from URL `https://github.com/Wilfred/ag.el'."
+  (interactive)
+  (unless (fboundp 'ag-project)
+    (error "Please install ag.el from https://github.com/Wilfred/ag.el"))
+  (if (thing-at-point 'symbol)
+      (let ((highlight-symbol-border-pattern '("\\b" . "\\b")))
+        (ag-project-regexp (highlight-symbol-get-symbol)))
+    (error "No symbol at point")))
+
 (defun highlight-symbol-get-symbol ()
   "Return a regular expression identifying the symbol at point."
   (let ((symbol (thing-at-point 'symbol)))
