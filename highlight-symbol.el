@@ -3,7 +3,7 @@
 ;; Copyright (C) 2007-2009, 2013-2015 Nikolaj Schumacher
 ;;
 ;; Author: Nikolaj Schumacher <bugs * nschum de>
-;; Version: 1.2
+;; Version: 1.3
 ;; Keywords: faces, matching
 ;; URL: http://nschum.de/src/emacs/highlight-symbol/
 ;; Compatibility: GNU Emacs 22.x, GNU Emacs 23.x, GNU Emacs 24.x
@@ -47,6 +47,7 @@
 ;;
 ;;; Change Log:
 ;;
+;; 2015-04-22 (1.3)
 ;;    Added `highlight-symbol-count'.
 ;;    Renamed `highlight-symbol-at-point' to `highlight-symbol' because
 ;;      hi-lock took that name.
