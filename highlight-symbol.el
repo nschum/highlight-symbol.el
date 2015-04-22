@@ -27,12 +27,12 @@
 ;;
 ;; Add the following to your .emacs file:
 ;; (require 'highlight-symbol)
-;; (global-set-key [(control f3)] 'highlight-symbol-at-point)
+;; (global-set-key [(control f3)] 'highlight-symbol)
 ;; (global-set-key [f3] 'highlight-symbol-next)
 ;; (global-set-key [(shift f3)] 'highlight-symbol-prev)
 ;; (global-set-key [(meta f3)] 'highlight-symbol-query-replace)
 ;;
-;; Use `highlight-symbol-at-point' to toggle highlighting of the symbol at
+;; Use `highlight-symbol' to toggle highlighting of the symbol at
 ;; point throughout the current buffer.  Use `highlight-symbol-mode' to keep the
 ;; symbol at point highlighted.
 ;;
@@ -47,6 +47,8 @@
 ;;
 ;;; Change Log:
 ;;
+;;    Renamed `highlight-symbol-at-point' to `highlight-symbol' because
+;;      hi-lock took that name.
 ;;    Added `highlight-symbol-nav-mode'.  (thanks to Sebastian Wiesner)
 ;;    Added `highlight-symbol-foreground-color'.  (thanks to rubikitch)
 ;;
@@ -135,7 +137,7 @@ disabled for all buffers."
 (defcustom highlight-symbol-colors
   '("yellow" "DeepPink" "cyan" "MediumPurple1" "SpringGreen1"
     "DarkOrange" "HotPink1" "RoyalBlue1" "OliveDrab")
-  "Colors and/or faces used by `highlight-symbol-at-point'.
+  "Colors and/or faces used by `highlight-symbol'.
 highlighting the symbols will use these colors/faces in order."
   :type '(repeat (choice color face))
   :group 'highlight-symbol)
@@ -180,7 +182,10 @@ Highlighting takes place after `highlight-symbol-idle-delay'."
     (kill-local-variable 'highlight-symbol)))
 
 ;;;###autoload
-(defun highlight-symbol-at-point ()
+(defalias 'highlight-symbol-at-point 'highlight-symbol)
+
+;;;###autoload
+(defun highlight-symbol ()
   "Toggle highlighting of the symbol at point.
 This highlights or unhighlights the symbol at point using the first
 element in of `highlight-symbol-faces'."
