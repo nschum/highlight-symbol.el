@@ -47,6 +47,7 @@
 ;;
 ;;; Change Log:
 ;;
+;;    Added `highlight-symbol-count'.
 ;;    Renamed `highlight-symbol-at-point' to `highlight-symbol' because
 ;;      hi-lock took that name.
 ;;    Added `highlight-symbol-nav-mode'.  (thanks to Sebastian Wiesner)
@@ -185,7 +186,7 @@ Highlighting takes place after `highlight-symbol-idle-delay'."
 (defalias 'highlight-symbol-at-point 'highlight-symbol)
 
 ;;;###autoload
-(defun highlight-symbol (&optional symbol)
+(defun highlight-symbol (&optional symbol quiet)
   "Toggle highlighting of the symbol at point.
 This highlights or unhighlights the symbol at point using the first
 element in of `highlight-symbol-faces'."
@@ -195,7 +196,9 @@ element in of `highlight-symbol-faces'."
                     (error "No symbol at point"))))
     (if (highlight-symbol-symbol-highlighted-p symbol)
         (highlight-symbol-remove-symbol symbol)
-      (highlight-symbol-add-symbol symbol))))
+      (highlight-symbol-add-symbol symbol)
+      (unless quiet
+        (highlight-symbol-count symbol)))))
 
 (defun highlight-symbol-symbol-highlighted-p (symbol)
   "Test if the a symbol regexp is currently highlighted."
@@ -252,6 +255,17 @@ element in of `highlight-symbol-faces'."
     (propertize (substring symbol prefix-length
                            (- (length symbol) suffix-length))
                 'face (assoc symbol (highlight-symbol-uncompiled-keywords)))))
+
+;;;###autoload
+(defun highlight-symbol-count (&optional symbol)
+  "Print the number of occurrences of symbol at point."
+  (interactive)
+  (message "%d occurrences in buffer"
+           (let ((case-fold-search nil))
+             (how-many (or symbol
+                           (highlight-symbol-get-symbol)
+                           (error "No symbol at point"))
+                       (point-min) (point-max)))))
 
 ;;;###autoload
 (defun highlight-symbol-next ()
@@ -349,7 +363,8 @@ before if NLINES is negative."
         (when symbol
           (setq highlight-symbol symbol)
           (highlight-symbol-add-symbol-with-face symbol 'highlight-symbol-face)
-          (font-lock-fontify-buffer))))))
+          (font-lock-fontify-buffer)
+          (highlight-symbol-count))))))
 
 (defun highlight-symbol-mode-remove-temp ()
   "Remove the temporary symbol highlighting."
