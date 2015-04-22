@@ -185,13 +185,14 @@ Highlighting takes place after `highlight-symbol-idle-delay'."
 (defalias 'highlight-symbol-at-point 'highlight-symbol)
 
 ;;;###autoload
-(defun highlight-symbol ()
+(defun highlight-symbol (&optional symbol)
   "Toggle highlighting of the symbol at point.
 This highlights or unhighlights the symbol at point using the first
 element in of `highlight-symbol-faces'."
   (interactive)
-  (let ((symbol (highlight-symbol-get-symbol)))
-    (unless symbol (error "No symbol at point"))
+  (let ((symbol (or symbol
+                    (highlight-symbol-get-symbol)
+                    (error "No symbol at point"))))
     (if (highlight-symbol-symbol-highlighted-p symbol)
         (highlight-symbol-remove-symbol symbol)
       (highlight-symbol-add-symbol symbol))))
