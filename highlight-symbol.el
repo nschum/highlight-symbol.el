@@ -177,10 +177,11 @@ If nil, don't message the number of occurrences.  If `explicit',
 message only when `highlight-symbol' is called explicitly.  If
 `temporary', message only when the symbol under point is
 temporarily highlighted by `highlight-symbol-mode'."
-  :type '(choice (const :tag "Don't message occurrences count" nil)
-                 (const :tag "Always message occurrences count" t)
-                 (const :tag "Message only for explicit highlighting" explicit)
-                 (const :tag "Message only for temporary highlighting" temporary))
+  :type '(choice
+          (const :tag "Don't message occurrences count" nil)
+          (const :tag "Always message occurrences count" t)
+          (const :tag "Message only for explicit highlighting" explicit)
+          (const :tag "Message only for temporary highlighting" temporary))
   :group 'highlight-symbol)
 
 ;;;###autoload
