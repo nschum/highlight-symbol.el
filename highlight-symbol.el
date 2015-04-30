@@ -47,6 +47,9 @@
 ;;
 ;;; Change Log:
 ;;
+;; 2015-04-30
+;;    Added `highlight-symbol-print-occurrence-count'.
+;;
 ;; 2015-04-22 (1.3)
 ;;    Added `highlight-symbol-count'.
 ;;    Renamed `highlight-symbol-at-point' to `highlight-symbol' because
@@ -168,6 +171,19 @@ highlighting the symbols will use these colors/faces in order."
                  (const :tag "Keep original text color" nil))
   :group 'highlight-symbol)
 
+(defcustom highlight-symbol-print-occurrence-count 'explicit
+  "*If t, message the number of occurrences of the current symbol.
+If nil, don't message the number of occurrences.  If `explicit',
+message only when `highlight-symbol' is called explicitly.  If
+`temporary', message only when the symbol under point is
+temporarily highlighted by `highlight-symbol-mode'."
+  :type '(choice
+          (const :tag "Don't message occurrences count" nil)
+          (const :tag "Always message occurrences count" t)
+          (const :tag "Message only for explicit highlighting" explicit)
+          (const :tag "Message only for temporary highlighting" temporary))
+  :group 'highlight-symbol)
+
 ;;;###autoload
 (define-minor-mode highlight-symbol-mode
   "Minor mode that highlights the symbol under point throughout the buffer.
@@ -187,7 +203,7 @@ Highlighting takes place after `highlight-symbol-idle-delay'."
 (defalias 'highlight-symbol-at-point 'highlight-symbol)
 
 ;;;###autoload
-(defun highlight-symbol (&optional symbol quiet)
+(defun highlight-symbol (&optional symbol)
   "Toggle highlighting of the symbol at point.
 This highlights or unhighlights the symbol at point using the first
 element in of `highlight-symbol-faces'."
@@ -198,7 +214,8 @@ element in of `highlight-symbol-faces'."
     (if (highlight-symbol-symbol-highlighted-p symbol)
         (highlight-symbol-remove-symbol symbol)
       (highlight-symbol-add-symbol symbol)
-      (unless quiet
+      (when (or (eq highlight-symbol-print-occurrence-count t)
+                (eq highlight-symbol-print-occurrence-count 'explicit))
         (highlight-symbol-count symbol)))))
 
 (defun highlight-symbol-symbol-highlighted-p (symbol)
@@ -365,7 +382,9 @@ before if NLINES is negative."
           (setq highlight-symbol symbol)
           (highlight-symbol-add-symbol-with-face symbol 'highlight-symbol-face)
           (font-lock-fontify-buffer)
-          (highlight-symbol-count))))))
+          (when (or (eq highlight-symbol-print-occurrence-count t)
+                    (eq highlight-symbol-print-occurrence-count 'temporary))
+            (highlight-symbol-count)))))))
 
 (defun highlight-symbol-mode-remove-temp ()
   "Remove the temporary symbol highlighting."
