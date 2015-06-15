@@ -147,7 +147,7 @@ highlighting the symbols will use these colors/faces in order."
   :group 'highlight-symbol)
 
 (defcustom highlight-symbol-ignore-list '()
-  "List of exceptions (Regex)."
+  "List of regexp rules that specifies what symbols should not be highlighted."
   :type '(repeat string)
   :group 'highlight-symbol)
 
