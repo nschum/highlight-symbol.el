@@ -335,12 +335,12 @@ before if NLINES is negative."
   "Return a regular expression identifying the symbol at point."
   (let ((symbol (thing-at-point 'symbol)))
     (when (and symbol
-	       (not (member 0 (mapcar
-			       (lambda (e) (string-match e symbol))
-			       highlight-symbol-ignore-list))))
+               (not (member 0 (mapcar
+                               (lambda (e) (string-match e symbol))
+                               highlight-symbol-ignore-list))))
       (concat (car highlight-symbol-border-pattern)
-	      (regexp-quote symbol)
-	      (cdr highlight-symbol-border-pattern)))))
+              (regexp-quote symbol)
+              (cdr highlight-symbol-border-pattern)))))
 
 (defun highlight-symbol-temp-highlight ()
   "Highlight the current symbol until a command is executed."
