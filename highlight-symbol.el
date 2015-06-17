@@ -153,6 +153,11 @@ highlighting the symbols will use these colors/faces in order."
   :type 'boolean
   :group 'highlight-symbol)
 
+(defcustom highlight-symbol-ignore-list '()
+  "List of regexp rules that specifies what symbols should not be highlighted."
+  :type '(repeat string)
+  :group 'highlight-symbol)
+
 (defvar highlight-symbol-color-index 0)
 (make-variable-buffer-local 'highlight-symbol-color-index)
 
@@ -367,9 +372,13 @@ before if NLINES is negative."
 (defun highlight-symbol-get-symbol ()
   "Return a regular expression identifying the symbol at point."
   (let ((symbol (thing-at-point 'symbol)))
-    (when symbol (concat (car highlight-symbol-border-pattern)
-                         (regexp-quote symbol)
-                         (cdr highlight-symbol-border-pattern)))))
+    (when (and symbol
+               (not (member 0 (mapcar
+                               (lambda (e) (string-match e symbol))
+                               highlight-symbol-ignore-list))))
+      (concat (car highlight-symbol-border-pattern)
+              (regexp-quote symbol)
+              (cdr highlight-symbol-border-pattern)))))
 
 (defun highlight-symbol-temp-highlight ()
   "Highlight the current symbol until a command is executed."
