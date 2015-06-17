@@ -47,7 +47,7 @@
 ;;
 ;;; Change Log:
 ;;
-;; 2015-04-30
+;;    Added `highlight-symbol-ignore-list'.
 ;;    Added `highlight-symbol-print-occurrence-count'.
 ;;
 ;; 2015-04-22 (1.3)
