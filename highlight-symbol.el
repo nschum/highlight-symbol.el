@@ -116,6 +116,8 @@
 
 (defvar highlight-symbol-timer nil)
 
+(defvar highlight-symbol-highlight-more-than-once nil)
+
 (defun highlight-symbol-update-timer (value)
   (when highlight-symbol-timer
     (cancel-timer highlight-symbol-timer))
@@ -218,7 +220,9 @@ element in of `highlight-symbol-faces'."
                     (error "No symbol at point"))))
     (if (highlight-symbol-symbol-highlighted-p symbol)
         (highlight-symbol-remove-symbol symbol)
-      (highlight-symbol-add-symbol symbol)
+      (if (or highlight-symbol-highlight-more-than-once
+               (> (highlight-symbol-count-no-message symbol) 1))
+          (highlight-symbol-add-symbol symbol))
       (when (or (eq highlight-symbol-print-occurrence-count t)
                 (eq highlight-symbol-print-occurrence-count 'explicit))
         (highlight-symbol-count symbol)))))
@@ -280,15 +284,22 @@ element in of `highlight-symbol-faces'."
                 'face (assoc symbol (highlight-symbol-uncompiled-keywords)))))
 
 ;;;###autoload
+(defun highlight-symbol-count-no-message (&optional symbol)
+  "Return the number of occurrences of symbol at point."
+  (interactive)
+  (let ((case-fold-search nil))
+    (how-many (or symbol
+                  (highlight-symbol-get-symbol)
+                  (error "No symbol at point"))
+              (point-min) (point-max))))
+
+;;;###autoload
 (defun highlight-symbol-count (&optional symbol)
   "Print the number of occurrences of symbol at point."
   (interactive)
   (message "%d occurrences in buffer"
            (let ((case-fold-search nil))
-             (how-many (or symbol
-                           (highlight-symbol-get-symbol)
-                           (error "No symbol at point"))
-                       (point-min) (point-max)))))
+             (highlight-symbol-count-no-message symbol))))
 
 ;;;###autoload
 (defun highlight-symbol-next ()
