@@ -221,7 +221,7 @@ element in of `highlight-symbol-faces'."
     (if (highlight-symbol-symbol-highlighted-p symbol)
         (highlight-symbol-remove-symbol symbol)
       (if (or highlight-symbol-highlight-more-than-once
-               (> (highlight-symbol-count-no-message symbol) 1))
+              (> (highlight-symbol-count-no-message symbol) 1))
           (highlight-symbol-add-symbol symbol))
       (when (or (eq highlight-symbol-print-occurrence-count t)
                 (eq highlight-symbol-print-occurrence-count 'explicit))
