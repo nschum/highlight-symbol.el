@@ -244,15 +244,21 @@ element in of `highlight-symbol-faces'."
       (highlight-symbol-add-symbol-with-face symbol color)
       (push symbol highlight-symbol-list))))
 
+(defun highlight-symbol-font-lock-ensure ()
+  (if (fboundp 'font-lock-ensure)
+      (font-lock-ensure)
+    (with-no-warnings
+      (font-lock-fontify-buffer))))
+
 (defun highlight-symbol-add-symbol-with-face (symbol face)
   (font-lock-add-keywords nil `((,symbol 0 ',face prepend)) 'append)
-  (font-lock-fontify-buffer))
+  (highlight-symbol-font-lock-ensure))
 
 (defun highlight-symbol-remove-symbol (symbol)
   (setq highlight-symbol-list (delete symbol highlight-symbol-list))
   (let ((keywords (assoc symbol (highlight-symbol-uncompiled-keywords))))
     (font-lock-remove-keywords nil (list keywords))
-    (font-lock-fontify-buffer)))
+    (highlight-symbol-font-lock-ensure)))
 
 (defun highlight-symbol-uncompiled-keywords ()
   (if (eq t (car font-lock-keywords))
@@ -390,7 +396,7 @@ before if NLINES is negative."
         (when symbol
           (setq highlight-symbol symbol)
           (highlight-symbol-add-symbol-with-face symbol 'highlight-symbol-face)
-          (font-lock-fontify-buffer)
+          (highlight-symbol-font-lock-ensure)
           (when (or (eq highlight-symbol-print-occurrence-count t)
                     (eq highlight-symbol-print-occurrence-count 'temporary))
             (highlight-symbol-count)))))))
