@@ -286,15 +286,17 @@ element in of `highlight-symbol-faces'."
                 'face (assoc symbol (highlight-symbol-uncompiled-keywords)))))
 
 ;;;###autoload
-(defun highlight-symbol-count (&optional symbol)
+(defun highlight-symbol-count (&optional symbol message-p)
   "Print the number of occurrences of symbol at point."
-  (interactive)
-  (message "%d occurrences in buffer"
-           (let ((case-fold-search nil))
-             (how-many (or symbol
-                           (highlight-symbol-get-symbol)
-                           (error "No symbol at point"))
-                       (point-min) (point-max)))))
+  (interactive '(nil t))
+  (let ((count (let ((case-fold-search nil))
+                 (how-many (or symbol
+                               (highlight-symbol-get-symbol)
+                               (error "No symbol at point"))
+                           (point-min) (point-max)))))
+    (when message-p
+      (message "%d occurrences in buffer" count))
+    count))
 
 ;;;###autoload
 (defun highlight-symbol-next ()
