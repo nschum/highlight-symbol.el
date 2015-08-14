@@ -47,6 +47,7 @@
 ;;
 ;;; Change Log:
 ;;
+;;    Added `highlight-symbol-highlight-single-occurrence-p`.
 ;;    Added `highlight-symbol-ignore-list'.
 ;;    Added `highlight-symbol-print-occurrence-count'.
 ;;
@@ -141,6 +142,13 @@ disabled for all buffers."
   :set 'highlight-symbol-set
   :group 'highlight-symbol)
 
+(defcustom highlight-symbol-highlight-single-occurrence-p t
+  "Determines if `highlight-symbol-mode' highlights single occurrences.
+If nil, `highlight-symbol-mode' will only highlight a symbol if there are
+more occurrences in this buffer."
+  :type 'boolean
+  :group 'highlight-symbol)
+
 (defcustom highlight-symbol-colors
   '("yellow" "DeepPink" "cyan" "MediumPurple1" "SpringGreen1"
     "DarkOrange" "HotPink1" "RoyalBlue1" "OliveDrab")
@@ -227,6 +235,11 @@ element in of `highlight-symbol-faces'."
 (defun highlight-symbol-symbol-highlighted-p (symbol)
   "Test if the a symbol regexp is currently highlighted."
   (member symbol highlight-symbol-list))
+
+(defun highlight-symbol-should-auto-highlight-p (symbol)
+  "Test if SYMBOL should be highlighted automatically."
+  (or highlight-symbol-highlight-single-occurrence-p
+      (> (highlight-symbol-count symbol) 1)))
 
 (defun highlight-symbol-add-symbol (symbol)
   (unless (highlight-symbol-symbol-highlighted-p symbol)
@@ -395,7 +408,7 @@ before if NLINES is negative."
     (unless (or (equal symbol highlight-symbol)
                 (highlight-symbol-symbol-highlighted-p symbol))
       (highlight-symbol-mode-remove-temp)
-      (when symbol
+      (when (and symbol (highlight-symbol-should-auto-highlight-p symbol))
         (setq highlight-symbol symbol)
         (highlight-symbol-add-symbol-with-face symbol 'highlight-symbol-face)
         (highlight-symbol-font-lock-ensure)
