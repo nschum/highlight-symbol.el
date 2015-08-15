@@ -184,17 +184,20 @@ highlighting the symbols will use these colors/faces in order."
                  (const :tag "Keep original text color" nil))
   :group 'highlight-symbol)
 
-(defcustom highlight-symbol-occurrence-message '(explicit)
+(defcustom highlight-symbol-occurrence-message '(explicit navigation)
   "*When to print the occurrence count of the current symbol.
 A list.
 If containing `explicit',
 message after `highlight-symbol' is called explicitly.
 If containing `temporary',
 message after the symbol under point is temporarily highlighted by
-`highlight-symbol-mode'."
+`highlight-symbol-mode'.
+If containing `navigation',
+message after navigation commands."
   :type '(set
           (const :tag "Message after explicit highlighting" explicit)
-          (const :tag "Message after temporary highlighting" temporary))
+          (const :tag "Message after temporary highlighting" temporary)
+          (const :tag "Message after navigation commands" navigation))
   :group 'highlight-symbol)
 
 ;;;###autoload
@@ -453,6 +456,8 @@ DIR has to be 1 or -1."
               (message "Continued from beginning of buffer")
               (setq target (re-search-forward symbol nil nil dir)))
             (goto-char (+ target offset)))
+          (when (member 'navigation highlight-symbol-occurrence-message)
+            (highlight-symbol-count symbol t))
           (setq this-command 'highlight-symbol-jump))
       (error "No symbol at point"))))
 
