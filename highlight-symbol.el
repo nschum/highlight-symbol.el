@@ -404,17 +404,18 @@ before if NLINES is negative."
 
 (defun highlight-symbol-temp-highlight ()
   "Highlight the current symbol until a command is executed."
-  (let ((symbol (highlight-symbol-get-symbol)))
-    (unless (or (equal symbol highlight-symbol)
-                (highlight-symbol-symbol-highlighted-p symbol))
-      (highlight-symbol-mode-remove-temp)
-      (when (and symbol (highlight-symbol-should-auto-highlight-p symbol))
-        (setq highlight-symbol symbol)
-        (highlight-symbol-add-symbol-with-face symbol 'highlight-symbol-face)
-        (highlight-symbol-font-lock-ensure)
-        (when (or (eq highlight-symbol-print-occurrence-count t)
-                  (eq highlight-symbol-print-occurrence-count 'temporary))
-          (highlight-symbol-count))))))
+  (when highlight-symbol-mode
+    (let ((symbol (highlight-symbol-get-symbol)))
+      (unless (or (equal symbol highlight-symbol)
+                  (highlight-symbol-symbol-highlighted-p symbol))
+        (highlight-symbol-mode-remove-temp)
+        (when (and symbol (highlight-symbol-should-auto-highlight-p symbol))
+          (setq highlight-symbol symbol)
+          (highlight-symbol-add-symbol-with-face symbol 'highlight-symbol-face)
+          (highlight-symbol-font-lock-ensure)
+          (when (or (eq highlight-symbol-print-occurrence-count t)
+                    (eq highlight-symbol-print-occurrence-count 'temporary))
+            (highlight-symbol-count)))))))
 
 (defun highlight-symbol-mode-remove-temp ()
   "Remove the temporary symbol highlighting."
