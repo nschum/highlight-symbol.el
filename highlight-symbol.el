@@ -258,21 +258,22 @@ element in of `highlight-symbol-faces'."
       (highlight-symbol-add-symbol-with-face symbol color)
       (push symbol highlight-symbol-list))))
 
-(defun highlight-symbol-font-lock-ensure ()
-  (if (fboundp 'font-lock-ensure)
-      (font-lock-ensure)
+(defun highlight-symbol-flush ()
+  (if (fboundp 'font-lock-flush)
+      (font-lock-flush)
+    ;; Emacs < 25
     (with-no-warnings
       (font-lock-fontify-buffer))))
 
 (defun highlight-symbol-add-symbol-with-face (symbol face)
   (font-lock-add-keywords nil `((,symbol 0 ',face prepend)) 'append)
-  (highlight-symbol-font-lock-ensure))
+  (highlight-symbol-flush))
 
 (defun highlight-symbol-remove-symbol (symbol)
   (setq highlight-symbol-list (delete symbol highlight-symbol-list))
   (let ((keywords (assoc symbol (highlight-symbol-uncompiled-keywords))))
     (font-lock-remove-keywords nil (list keywords))
-    (highlight-symbol-font-lock-ensure)))
+    (highlight-symbol-flush)))
 
 (defun highlight-symbol-uncompiled-keywords ()
   (if (eq t (car font-lock-keywords))
@@ -411,7 +412,7 @@ before if NLINES is negative."
       (when (and symbol (highlight-symbol-should-auto-highlight-p symbol))
         (setq highlight-symbol symbol)
         (highlight-symbol-add-symbol-with-face symbol 'highlight-symbol-face)
-        (highlight-symbol-font-lock-ensure)
+        (highlight-symbol-flush)
         (when (or (eq highlight-symbol-print-occurrence-count t)
                   (eq highlight-symbol-print-occurrence-count 'temporary))
           (highlight-symbol-count symbol t))))))
