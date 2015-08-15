@@ -184,17 +184,17 @@ highlighting the symbols will use these colors/faces in order."
                  (const :tag "Keep original text color" nil))
   :group 'highlight-symbol)
 
-(defcustom highlight-symbol-occurrence-message 'explicit
-  "*If t, message the number of occurrences of the current symbol.
-If nil, don't message the number of occurrences.  If `explicit',
-message only when `highlight-symbol' is called explicitly.  If
-`temporary', message only when the symbol under point is
-temporarily highlighted by `highlight-symbol-mode'."
-  :type '(choice
-          (const :tag "Don't message occurrences count" nil)
-          (const :tag "Always message occurrences count" t)
-          (const :tag "Message only for explicit highlighting" explicit)
-          (const :tag "Message only for temporary highlighting" temporary))
+(defcustom highlight-symbol-occurrence-message '(explicit)
+  "*When to print the occurrence count of the current symbol.
+A list.
+If containing `explicit',
+message after `highlight-symbol' is called explicitly.
+If containing `temporary',
+message after the symbol under point is temporarily highlighted by
+`highlight-symbol-mode'."
+  :type '(set
+          (const :tag "Message after explicit highlighting" explicit)
+          (const :tag "Message after temporary highlighting" temporary))
   :group 'highlight-symbol)
 
 ;;;###autoload
@@ -227,8 +227,7 @@ element in of `highlight-symbol-faces'."
     (if (highlight-symbol-symbol-highlighted-p symbol)
         (highlight-symbol-remove-symbol symbol)
       (highlight-symbol-add-symbol symbol)
-      (when (or (eq highlight-symbol-occurrence-message t)
-                (eq highlight-symbol-occurrence-message 'explicit))
+      (when (member 'explicit highlight-symbol-occurrence-message)
         (highlight-symbol-count symbol t)))))
 
 (defun highlight-symbol-symbol-highlighted-p (symbol)
@@ -413,8 +412,7 @@ before if NLINES is negative."
           (setq highlight-symbol symbol)
           (highlight-symbol-add-symbol-with-face symbol 'highlight-symbol-face)
           (highlight-symbol-flush)
-          (when (or (eq highlight-symbol-occurrence-message t)
-                    (eq highlight-symbol-occurrence-message 'temporary))
+          (when (member 'temporary highlight-symbol-occurrence-message)
             (highlight-symbol-count symbol t)))))))
 
 (defun highlight-symbol-mode-remove-temp ()
