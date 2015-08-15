@@ -49,7 +49,7 @@
 ;;
 ;;    Added `highlight-symbol-highlight-single-occurrence'.
 ;;    Added `highlight-symbol-ignore-list'.
-;;    Added `highlight-symbol-print-occurrence-count'.
+;;    Added `highlight-symbol-occurrence-message'.
 ;;
 ;; 2015-04-22 (1.3)
 ;;    Added `highlight-symbol-count'.
@@ -184,7 +184,7 @@ highlighting the symbols will use these colors/faces in order."
                  (const :tag "Keep original text color" nil))
   :group 'highlight-symbol)
 
-(defcustom highlight-symbol-print-occurrence-count 'explicit
+(defcustom highlight-symbol-occurrence-message 'explicit
   "*If t, message the number of occurrences of the current symbol.
 If nil, don't message the number of occurrences.  If `explicit',
 message only when `highlight-symbol' is called explicitly.  If
@@ -227,8 +227,8 @@ element in of `highlight-symbol-faces'."
     (if (highlight-symbol-symbol-highlighted-p symbol)
         (highlight-symbol-remove-symbol symbol)
       (highlight-symbol-add-symbol symbol)
-      (when (or (eq highlight-symbol-print-occurrence-count t)
-                (eq highlight-symbol-print-occurrence-count 'explicit))
+      (when (or (eq highlight-symbol-occurrence-message t)
+                (eq highlight-symbol-occurrence-message 'explicit))
         (highlight-symbol-count symbol t)))))
 
 (defun highlight-symbol-symbol-highlighted-p (symbol)
@@ -413,8 +413,8 @@ before if NLINES is negative."
           (setq highlight-symbol symbol)
           (highlight-symbol-add-symbol-with-face symbol 'highlight-symbol-face)
           (highlight-symbol-flush)
-          (when (or (eq highlight-symbol-print-occurrence-count t)
-                    (eq highlight-symbol-print-occurrence-count 'temporary))
+          (when (or (eq highlight-symbol-occurrence-message t)
+                    (eq highlight-symbol-occurrence-message 'temporary))
             (highlight-symbol-count symbol t)))))))
 
 (defun highlight-symbol-mode-remove-temp ()
