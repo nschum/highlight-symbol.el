@@ -47,7 +47,7 @@
 ;;
 ;;; Change Log:
 ;;
-;;    Added `highlight-symbol-highlight-single-occurrence-p`.
+;;    Added `highlight-symbol-highlight-single-occurrence-p'.
 ;;    Added `highlight-symbol-ignore-list'.
 ;;    Added `highlight-symbol-print-occurrence-count'.
 ;;
