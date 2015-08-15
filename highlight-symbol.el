@@ -230,7 +230,7 @@ element in of `highlight-symbol-faces'."
       (highlight-symbol-add-symbol symbol)
       (when (or (eq highlight-symbol-print-occurrence-count t)
                 (eq highlight-symbol-print-occurrence-count 'explicit))
-        (highlight-symbol-count symbol)))))
+        (highlight-symbol-count symbol t)))))
 
 (defun highlight-symbol-symbol-highlighted-p (symbol)
   "Test if the a symbol regexp is currently highlighted."
@@ -414,7 +414,7 @@ before if NLINES is negative."
         (highlight-symbol-font-lock-ensure)
         (when (or (eq highlight-symbol-print-occurrence-count t)
                   (eq highlight-symbol-print-occurrence-count 'temporary))
-          (highlight-symbol-count))))))
+          (highlight-symbol-count symbol t))))))
 
 (defun highlight-symbol-mode-remove-temp ()
   "Remove the temporary symbol highlighting."
