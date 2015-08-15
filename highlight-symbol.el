@@ -311,9 +311,11 @@ element in of `highlight-symbol-faces'."
          (case-fold-search nil)
          (count (how-many symbol (point-min) (point-max))))
     (when message-p
-      (message "Occurrence %d/%d in buffer"
-               (1+ (how-many symbol (point-min) (1- (point))))
-               count))
+      (if (= count 0)
+          (message "Only occurrence in buffer")
+        (message "Occurrence %d/%d in buffer"
+                 (1+ (how-many symbol (point-min) (1- (point))))
+                 count)))
     count))
 
 ;;;###autoload
@@ -444,6 +446,7 @@ DIR has to be 1 or -1."
   (let ((symbol (highlight-symbol-get-symbol)))
     (if symbol
         (let* ((case-fold-search nil)
+               (msg (member 'navigation highlight-symbol-occurrence-message))
                (bounds (bounds-of-thing-at-point 'symbol))
                (offset (- (point) (if (< 0 dir) (cdr bounds) (car bounds)))))
           (unless (eq last-command 'highlight-symbol-jump)
@@ -453,10 +456,11 @@ DIR has to be 1 or -1."
           (let ((target (re-search-forward symbol nil t dir)))
             (unless target
               (goto-char (if (< 0 dir) (point-min) (point-max)))
-              (message "Continued from beginning of buffer")
+              (unless msg
+                (message "Continued from beginning of buffer"))
               (setq target (re-search-forward symbol nil nil dir)))
             (goto-char (+ target offset)))
-          (when (member 'navigation highlight-symbol-occurrence-message)
+          (when msg
             (highlight-symbol-count symbol t))
           (setq this-command 'highlight-symbol-jump))
       (error "No symbol at point"))))
