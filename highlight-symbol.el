@@ -47,7 +47,7 @@
 ;;
 ;;; Change Log:
 ;;
-;;    Added `highlight-symbol-highlight-single-occurrence-p'.
+;;    Added `highlight-symbol-highlight-single-occurrence'.
 ;;    Added `highlight-symbol-ignore-list'.
 ;;    Added `highlight-symbol-print-occurrence-count'.
 ;;
@@ -142,7 +142,7 @@ disabled for all buffers."
   :set 'highlight-symbol-set
   :group 'highlight-symbol)
 
-(defcustom highlight-symbol-highlight-single-occurrence-p t
+(defcustom highlight-symbol-highlight-single-occurrence t
   "Determines if `highlight-symbol-mode' highlights single occurrences.
 If nil, `highlight-symbol-mode' will only highlight a symbol if there are
 more occurrences in this buffer."
@@ -238,7 +238,7 @@ element in of `highlight-symbol-faces'."
 
 (defun highlight-symbol-should-auto-highlight-p (symbol)
   "Test if SYMBOL should be highlighted automatically."
-  (or highlight-symbol-highlight-single-occurrence-p
+  (or highlight-symbol-highlight-single-occurrence
       (> (highlight-symbol-count symbol) 1)))
 
 (defun highlight-symbol-add-symbol (symbol)
