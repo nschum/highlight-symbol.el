@@ -117,21 +117,19 @@
 
 (defvar highlight-symbol-timer nil)
 
-;; forward declaration
-(defvar highlight-symbol-mode nil)
-
 (defun highlight-symbol-update-timer (value)
   (when highlight-symbol-timer
     (cancel-timer highlight-symbol-timer))
-  (when highlight-symbol-mode
-    (setq highlight-symbol-timer
-          (and value (/= value 0)
-               (run-with-idle-timer value t
-                                    'highlight-symbol-temp-highlight)))))
+  (setq highlight-symbol-timer
+        (and value (/= value 0)
+             (run-with-idle-timer value t 'highlight-symbol-temp-highlight))))
+
+(defvar highlight-symbol-mode nil)
 
 (defun highlight-symbol-set (symbol value)
   (when symbol (set symbol value))
-  (highlight-symbol-update-timer value))
+  (when highlight-symbol-mode
+    (highlight-symbol-update-timer value)))
 
 (defcustom highlight-symbol-idle-delay 1.5
   "Number of seconds of idle time before highlighting the current symbol.
@@ -206,12 +204,13 @@ Highlighting takes place after `highlight-symbol-idle-delay'."
   nil " hl-s" nil
   (if highlight-symbol-mode
       ;; on
-      (add-hook 'post-command-hook 'highlight-symbol-mode-post-command nil t)
+      (progn
+        (highlight-symbol-update-timer highlight-symbol-idle-delay)
+        (add-hook 'post-command-hook 'highlight-symbol-mode-post-command nil t))
     ;; off
     (remove-hook 'post-command-hook 'highlight-symbol-mode-post-command t)
     (highlight-symbol-mode-remove-temp)
-    (kill-local-variable 'highlight-symbol))
-  (highlight-symbol-update-timer highlight-symbol-idle-delay))
+    (kill-local-variable 'highlight-symbol)))
 
 ;;;###autoload
 (defalias 'highlight-symbol-at-point 'highlight-symbol)
@@ -405,17 +404,18 @@ before if NLINES is negative."
 
 (defun highlight-symbol-temp-highlight ()
   "Highlight the current symbol until a command is executed."
-  (let ((symbol (highlight-symbol-get-symbol)))
-    (unless (or (equal symbol highlight-symbol)
-                (highlight-symbol-symbol-highlighted-p symbol))
-      (highlight-symbol-mode-remove-temp)
-      (when (and symbol (highlight-symbol-should-auto-highlight-p symbol))
-        (setq highlight-symbol symbol)
-        (highlight-symbol-add-symbol-with-face symbol 'highlight-symbol-face)
-        (highlight-symbol-flush)
-        (when (or (eq highlight-symbol-print-occurrence-count t)
-                  (eq highlight-symbol-print-occurrence-count 'temporary))
-          (highlight-symbol-count symbol t))))))
+  (when highlight-symbol-mode
+    (let ((symbol (highlight-symbol-get-symbol)))
+      (unless (or (equal symbol highlight-symbol)
+                  (highlight-symbol-symbol-highlighted-p symbol))
+        (highlight-symbol-mode-remove-temp)
+        (when (and symbol (highlight-symbol-should-auto-highlight-p symbol))
+          (setq highlight-symbol symbol)
+          (highlight-symbol-add-symbol-with-face symbol 'highlight-symbol-face)
+          (highlight-symbol-flush)
+          (when (or (eq highlight-symbol-print-occurrence-count t)
+                    (eq highlight-symbol-print-occurrence-count 'temporary))
+            (highlight-symbol-count symbol t)))))))
 
 (defun highlight-symbol-mode-remove-temp ()
   "Remove the temporary symbol highlighting."
