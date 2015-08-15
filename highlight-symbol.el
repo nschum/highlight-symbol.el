@@ -302,13 +302,15 @@ element in of `highlight-symbol-faces'."
 (defun highlight-symbol-count (&optional symbol message-p)
   "Print the number of occurrences of symbol at point."
   (interactive '(nil t))
-  (let ((count (let ((case-fold-search nil))
-                 (how-many (or symbol
-                               (highlight-symbol-get-symbol)
-                               (error "No symbol at point"))
-                           (point-min) (point-max)))))
+  (let* ((symbol (or symbol
+                     (highlight-symbol-get-symbol)
+                     (error "No symbol at point")))
+         (case-fold-search nil)
+         (count (how-many symbol (point-min) (point-max))))
     (when message-p
-      (message "%d occurrences in buffer" count))
+      (message "Occurrence %d/%d in buffer"
+               (1+ (how-many symbol (point-min) (1- (point))))
+               count))
     count))
 
 ;;;###autoload
