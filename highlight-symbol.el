@@ -117,7 +117,7 @@
 
 (defvar highlight-symbol-timer nil)
 
-                                        ; forward declaration
+;; forward declaration
 (defvar highlight-symbol-mode nil)
 
 (defun highlight-symbol-update-timer (value)
