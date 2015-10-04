@@ -242,16 +242,21 @@ element in of `highlight-symbol-faces'."
   (or highlight-symbol-highlight-single-occurrence
       (> (highlight-symbol-count symbol) 1)))
 
-(defun highlight-symbol-add-symbol (symbol)
+(defun highlight-symbol-next-color ()
+  "Step to and return next color from the color ring."
+  (let ((color (nth highlight-symbol-color-index
+                    highlight-symbol-colors)))
+    (if color ;; wrap
+        (incf highlight-symbol-color-index)
+      (setq highlight-symbol-color-index 1
+            color (car highlight-symbol-colors)))
+    color))
+
+(defun highlight-symbol-add-symbol (symbol &optional color)
   (unless (highlight-symbol-symbol-highlighted-p symbol)
     (when (equal symbol highlight-symbol)
       (highlight-symbol-mode-remove-temp))
-    (let ((color (nth highlight-symbol-color-index
-                      highlight-symbol-colors)))
-      (if color ;; wrap
-          (incf highlight-symbol-color-index)
-        (setq highlight-symbol-color-index 1
-              color (car highlight-symbol-colors)))
+    (let ((color (or color (highlight-symbol-next-color))))
       (unless (facep color)
         (setq color `((background-color . ,color)
                       (foreground-color . ,highlight-symbol-foreground-color))))
