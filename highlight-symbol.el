@@ -6,7 +6,7 @@
 ;; Version: 1.3
 ;; Keywords: faces, matching
 ;; URL: http://nschum.de/src/emacs/highlight-symbol/
-;; Compatibility: GNU Emacs 22.x, GNU Emacs 23.x, GNU Emacs 24.x
+;; Compatibility: GNU Emacs 22.x, GNU Emacs 23.x, GNU Emacs 24.x, GNU Emacs 25.x
 ;;
 ;; This file is NOT part of GNU Emacs.
 ;;
