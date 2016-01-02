@@ -1,6 +1,6 @@
 ;;; highlight-symbol.el --- automatic and manual symbol highlighting
 ;;
-;; Copyright (C) 2007-2009, 2013-2015 Nikolaj Schumacher
+;; Copyright (C) 2007-2009, 2013-2016 Nikolaj Schumacher
 ;;
 ;; Author: Nikolaj Schumacher <bugs * nschum de>
 ;; Version: 1.3
