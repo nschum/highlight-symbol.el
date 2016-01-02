@@ -172,8 +172,8 @@ highlighting the symbols will use these colors/faces in order."
 (defvar highlight-symbol nil)
 (make-variable-buffer-local 'highlight-symbol)
 
-(defvar highlight-symbol-list nil)
-(make-variable-buffer-local 'highlight-symbol-list)
+(defvar highlight-symbol-keyword-alist nil)
+(make-variable-buffer-local 'highlight-symbol-keyword-alist)
 
 (defconst highlight-symbol-border-pattern
   (if (>= emacs-major-version 22) '("\\_<" . "\\_>") '("\\<" . "\\>")))
@@ -235,7 +235,7 @@ element in of `highlight-symbol-faces'."
 
 (defun highlight-symbol-symbol-highlighted-p (symbol)
   "Test if the a symbol regexp is currently highlighted."
-  (member symbol highlight-symbol-list))
+  (assoc symbol highlight-symbol-keyword-alist))
 
 (defun highlight-symbol-should-auto-highlight-p (symbol)
   "Test if SYMBOL should be highlighted automatically."
@@ -261,8 +261,7 @@ element in of `highlight-symbol-faces'."
         (setq color `((background-color . ,color)
                       (foreground-color . ,highlight-symbol-foreground-color))))
       ;; highlight
-      (highlight-symbol-add-symbol-with-face symbol color)
-      (push symbol highlight-symbol-list))))
+      (highlight-symbol-add-symbol-with-face symbol color))))
 
 (defun highlight-symbol-flush ()
   (if (fboundp 'font-lock-flush)
@@ -272,39 +271,38 @@ element in of `highlight-symbol-faces'."
       (font-lock-fontify-buffer))))
 
 (defun highlight-symbol-add-symbol-with-face (symbol face)
-  (font-lock-add-keywords nil `((,symbol 0 ',face prepend)) 'append)
-  (highlight-symbol-flush))
-
-(defun highlight-symbol-remove-symbol (symbol)
-  (setq highlight-symbol-list (delete symbol highlight-symbol-list))
-  (let ((keywords (assoc symbol (highlight-symbol-uncompiled-keywords))))
-    (font-lock-remove-keywords nil (list keywords))
+  (let ((keywords `(,symbol 0 ',face prepend)))
+    (push keywords highlight-symbol-keyword-alist)
+    (font-lock-add-keywords nil (list keywords) 'append)
     (highlight-symbol-flush)))
 
-(defun highlight-symbol-uncompiled-keywords ()
-  (if (eq t (car font-lock-keywords))
-      (cadr font-lock-keywords)
-    font-lock-keywords))
+(defun highlight-symbol-remove-symbol (symbol)
+  (let ((keywords (assoc symbol highlight-symbol-keyword-alist)))
+    (setq highlight-symbol-keyword-alist
+          (delq keywords highlight-symbol-keyword-alist))
+    (font-lock-remove-keywords nil (list keywords))
+    (highlight-symbol-flush)))
 
 ;;;###autoload
 (defun highlight-symbol-remove-all ()
   "Remove symbol highlighting in buffer."
   (interactive)
-  (mapc 'highlight-symbol-remove-symbol highlight-symbol-list))
+  (mapc 'highlight-symbol-remove-symbol
+        (mapcar 'car highlight-symbol-keyword-alist)))
 
 ;;;###autoload
 (defun highlight-symbol-list-all ()
   "List all symbols highlighted in the buffer."
   (interactive)
   (message "%s" (mapconcat 'highlight-symbol-fontify-symbol
-                           highlight-symbol-list ", ")))
+                           (mapcar 'car highlight-symbol-keyword-alist) ", ")))
 
 (defun highlight-symbol-fontify-symbol (symbol)
   (let ((prefix-length (length (car highlight-symbol-border-pattern)))
         (suffix-length (length (cdr highlight-symbol-border-pattern))))
     (propertize (substring symbol prefix-length
                            (- (length symbol) suffix-length))
-                'face (assoc symbol (highlight-symbol-uncompiled-keywords)))))
+                'face (assoc symbol highlight-symbol-keyword-alist))))
 
 ;;;###autoload
 (defun highlight-symbol-count (&optional symbol message-p)
