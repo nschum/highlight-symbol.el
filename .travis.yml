@@ -16,18 +16,16 @@ matrix:
 install:
   - if [ "$EMACS" = "emacs23" ]; then
         sudo apt-get update -qq &&
-        sudo apt-get install -qq emacs23-gtk emacs23-el;
+        sudo apt-get install -qq emacs23-nox;
     fi
   - if [ "$EMACS" = "emacs24" ]; then
-        sudo add-apt-repository -y ppa:cassou/emacs &&
         sudo apt-get update -qq &&
-        sudo apt-get install -qq emacs24 emacs24-el;
+        sudo apt-get install -qq emacs24-nox;
     fi
   - if [ "$EMACS" = "emacs-snapshot" ]; then
-        sudo add-apt-repository -y ppa:cassou/emacs &&
+        sudo add-apt-repository -y ppa:ubuntu-elisp &&
         sudo apt-get update -qq &&
-        sudo apt-get install -qq emacs-snapshot &&
-        sudo apt-get install -qq emacs-snapshot-el emacs-snapshot-gtk;
+        sudo apt-get install -qq emacs-snapshot-nox;
     fi
   - mkdir -p lib && curl https://raw.githubusercontent.com/nschum/elisp-lint/stable/elisp-lint.el > lib/elisp-lint.el
 
