@@ -200,11 +200,14 @@ message after navigation commands."
           (const :tag "Message after navigation commands" navigation))
   :group 'highlight-symbol)
 
+(defvar highlight-symbol-mode-lighter " hl-s"
+  "The mode-line lighter of Highlight-Symbol mode.")
+
 ;;;###autoload
 (define-minor-mode highlight-symbol-mode
   "Minor mode that highlights the symbol under point throughout the buffer.
 Highlighting takes place after `highlight-symbol-idle-delay'."
-  nil " hl-s" nil
+  nil highlight-symbol-mode-lighter nil
   (if highlight-symbol-mode
       ;; on
       (progn
