@@ -21,7 +21,7 @@ The functions `highlight-symbol-next`, `highlight-symbol-prev`,
 `highlight-symbol-next-in-defun` and `highlight-symbol-prev-in-defun` allow for
 cycling through the locations of any symbol at point.  Use
 `highlight-symbol-nav-mode` to enable key bindings (<key>M-p</key> and
-<key>M-p</key>) for navigation.  When `highlight-symbol-on-navigation-p` is set,
+<key>M-n</key>) for navigation.  When `highlight-symbol-on-navigation-p` is set,
 highlighting is triggered regardless of `highlight-symbol-idle-delay`.
 
 `highlight-symbol-query-replace` can be used to replace the symbol.
