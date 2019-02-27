@@ -140,6 +140,12 @@ disabled for all buffers."
   :set 'highlight-symbol-set
   :group 'highlight-symbol)
 
+(defcustom highlight-symbol-persist-until-change nil
+  "Whether the temporarily highlighted symbol persists (remains
+highlighted) until the idle timer highlights the next symbol.
+Setting this nil causes the highlight to be removed as soon as
+point moves.")
+
 (defcustom highlight-symbol-highlight-single-occurrence t
   "Determines if `highlight-symbol-mode' highlights single occurrences.
 If nil, `highlight-symbol-mode' will only highlight a symbol if there are
@@ -440,7 +446,8 @@ create the new one."
         (highlight-symbol-temp-highlight))
     (if (eql highlight-symbol-idle-delay 0)
         (highlight-symbol-temp-highlight)
-      (unless (equal highlight-symbol (highlight-symbol-get-symbol))
+      (unless (or highlight-symbol-persist-until-change
+               (equal highlight-symbol (highlight-symbol-get-symbol)))
         (highlight-symbol-mode-remove-temp)))))
 
 (defun highlight-symbol-jump (dir)
