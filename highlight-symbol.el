@@ -216,6 +216,10 @@ Highlighting takes place after `highlight-symbol-idle-delay'."
     (kill-local-variable 'highlight-symbol)))
 
 ;;;###autoload
+(define-globalized-minor-mode global-highlight-symbol-mode highlight-symbol-mode
+  (lambda () (highlight-symbol-mode 1)))
+
+;;;###autoload
 (defalias 'highlight-symbol-at-point 'highlight-symbol)
 
 ;;;###autoload

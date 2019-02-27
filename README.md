@@ -13,6 +13,11 @@ Add the following to your .emacs file:
     (global-set-key [(shift f3)] 'highlight-symbol-prev)
     (global-set-key [(meta f3)] 'highlight-symbol-query-replace)
 
+Or turn on `global-highlight-symbol-mode` to enable it globally:
+
+    (require 'highlight-symbol)
+    (global-highlight-symbol-mode 1)
+
 Use `highlight-symbol` to toggle highlighting of the symbol at
 point throughout the current buffer.  Use `highlight-symbol-mode` to keep the
 symbol at point highlighted.
