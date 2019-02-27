@@ -144,7 +144,9 @@ disabled for all buffers."
   "Whether the temporarily highlighted symbol persists (remains
 highlighted) until the idle timer highlights the next symbol.
 Setting this nil causes the highlight to be removed as soon as
-point moves.")
+point moves."
+  :type 'boolean
+  :group 'highlight-symbol)
 
 (defcustom highlight-symbol-highlight-single-occurrence t
   "Determines if `highlight-symbol-mode' highlights single occurrences.
@@ -447,7 +449,7 @@ create the new one."
     (if (eql highlight-symbol-idle-delay 0)
         (highlight-symbol-temp-highlight)
       (unless (or highlight-symbol-persist-until-change
-               (equal highlight-symbol (highlight-symbol-get-symbol)))
+                  (equal highlight-symbol (highlight-symbol-get-symbol)))
         (highlight-symbol-mode-remove-temp)))))
 
 (defun highlight-symbol-jump (dir)
