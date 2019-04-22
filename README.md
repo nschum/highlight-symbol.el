@@ -1,6 +1,8 @@
 highlight-symbol.el
 ===================
 
+**Deprecated:** use [symbol-overlay](https://github.com/wolray/symbol-overlay). See [this paragraph](https://github.com/wolray/symbol-overlay#advantages) for comparison.
+
 automatic and manual symbol highlighting for Emacs
 
 [![Build Status](https://travis-ci.org/nschum/highlight-symbol.el.png?branch=master)](https://travis-ci.org/nschum/highlight-symbol.el)
