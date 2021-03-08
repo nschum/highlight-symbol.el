@@ -98,7 +98,6 @@
 ;;; Code:
 
 (require 'thingatpt)
-(eval-when-compile (require 'cl))
 
 (push "^No symbol at point$" debug-ignored-errors)
 
@@ -247,7 +246,8 @@ element in of `highlight-symbol-faces'."
   (let ((color (nth highlight-symbol-color-index
                     highlight-symbol-colors)))
     (if color ;; wrap
-        (incf highlight-symbol-color-index)
+        (setq highlight-symbol-color-index
+              (1+ highlight-symbol-color-index))
       (setq highlight-symbol-color-index 1
             color (car highlight-symbol-colors)))
     color))
